@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">Cindemas Utiltiy</string>
+    <string name="app_name">Cindemas Utility</string>
     <string name="action_settings">Settings</string>
     <string name="description_card_image">card image</string>
     <string name="title_idol_select">Select idol</string>
