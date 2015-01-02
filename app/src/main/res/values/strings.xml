@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Cindemas Utiltiy</string>
+    <string name="action_settings">Settings</string>
+    <string name="description_card_image">card image</string>
+    <string name="title_idol_select">Select idol</string>
+    <string name="title_activity_profile">Idol profile</string>
+    <string name="info_rarity">Rarity:</string>
+    <string name="info_cost">Cost:</string>
+    <string name="info_maxlevel">Max level:</string>
+    <string name="before_awake">Before awake\n%s</string>
+    <string name="after_awake">After awake\n%s</string>
+    <string name="info_icon">idol icon</string>
+</resources>

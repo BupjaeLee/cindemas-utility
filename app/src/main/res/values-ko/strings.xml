@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">신데마스 보조 프로그램</string>
+    <string name="title_idol_select">아이돌 선택</string>
+    <string name="title_activity_profile">아이돌 프로필</string>
+    <string name="info_rarity">레어도 :</string>
+    <string name="info_cost">코스트 :</string>
+    <string name="info_maxlevel">최대레벨 :</string>
+    <string name="before_awake">특훈전\n%s</string>
+    <string name="after_awake">특훈후\n%s</string>
+    <string name="info_icon">아이돌 아이콘</string>
+</resources>
