@@ -18,10 +18,10 @@ import android.widget.SimpleCursorAdapter;
 
 import com.androidquery.AQuery;
 
-
 public class IdolSelectActivity extends ActionBarActivity {
-    public static final String CARD_ID = "bupjae.android.cindemasutility.CARD_ID";
+    public static final String EXTRA_CARD_ID = "bupjae.android.cindemasutility.extra.CARD_ID";
 
+    private AQuery aq;
     private CursorAdapter adapter;
 
     private LoaderManager.LoaderCallbacks<Cursor> cursorCallback = new LoaderManager.LoaderCallbacks<Cursor>() {
@@ -29,7 +29,11 @@ public class IdolSelectActivity extends ActionBarActivity {
         public Loader<Cursor> onCreateLoader(int i, Bundle bundle) {
             switch (i) {
                 case 0:
-                    return new CursorLoader(IdolSelectActivity.this, Uri.parse("content://bupjae.android.cindemasutility.card/base"), null, null, null, null);
+                    return new CursorLoader(
+                            IdolSelectActivity.this,
+                            Uri.parse("content://bupjae.android.cindemasutility.card/base"),
+                            new String[]{"*", "card_id AS _id"},
+                            null, null, null);
                 default:
                     throw new IllegalArgumentException("Wrong ID: " + i);
             }
@@ -39,7 +43,11 @@ public class IdolSelectActivity extends ActionBarActivity {
         public void onLoadFinished(Loader<Cursor> cursorLoader, Cursor cursor) {
             switch (cursorLoader.getId()) {
                 case 0:
-                    if (adapter != null && cursor != null) adapter.swapCursor(cursor);
+                    if (adapter != null && cursor != null) {
+                        adapter.swapCursor(cursor);
+                        aq.id(R.id.waiting_view).invisible();
+                        aq.id(R.id.list_view).visible();
+                    }
                     return;
                 default:
                     throw new IllegalArgumentException("Wrong ID: " + cursorLoader.getId());
@@ -63,14 +71,20 @@ public class IdolSelectActivity extends ActionBarActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_idol_select);
-        AQuery aq = new AQuery(this);
+        aq = new AQuery(this);
 
         adapter = new SimpleCursorAdapter(
                 this,
-                android.R.layout.simple_list_item_1,
+                R.layout.listitem_idol_select,
                 null,
-                new String[]{"card_name"},
-                new int[]{android.R.id.text1},
+                new String[]{
+                        "card_name", "attribute", "rarity", "cost", "icon_uri",
+                        "max_attack", "rate_attack", "max_defense", "rate_defense"
+                },
+                new int[]{
+                        R.id.info_name, R.id.info_attribute, R.id.info_rarity, R.id.info_cost, R.id.info_icon,
+                        R.id.info_max_attack, R.id.info_rate_attack, R.id.info_max_defense, R.id.info_rate_defense
+                },
                 0);
         aq.id(R.id.list_view).adapter(adapter).itemClicked(this, "onIdolSelected");
 
@@ -103,7 +117,7 @@ public class IdolSelectActivity extends ActionBarActivity {
     @SuppressWarnings("UnusedDeclaration")
     public void onIdolSelected(AdapterView<?> parent, View view, int position, long id) {
         Intent intent = new Intent();
-        intent.putExtra(CARD_ID, id);
+        intent.putExtra(EXTRA_CARD_ID, id);
         if (getIntent().getAction().equals(Intent.ACTION_MAIN)) {
             intent.setClass(IdolSelectActivity.this, IdolProfileActivity.class);
             startActivity(intent);

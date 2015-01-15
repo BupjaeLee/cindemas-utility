@@ -11,4 +11,8 @@
     <string name="before_awake">Before awake\n%s</string>
     <string name="after_awake">After awake\n%s</string>
     <string name="info_icon">idol icon</string>
+    <string name="waiting_message">Preparing database\nPlease wait</string>
+    <string name="info_maxattack">MATK:</string>
+    <string name="info_maxdefense">MDEF:</string>
+    <string name="show_secret_comments">Show secret comments</string>
 </resources>

@@ -17,4 +17,8 @@
         <item name="android:layout_width">0dp</item>
         <item name="android:layout_weight">1</item>
     </style>
+
+    <style name="SecondaryText">
+        <item name="android:textAppearance">?android:attr/textAppearanceSmall</item>
+    </style>
 </resources>
