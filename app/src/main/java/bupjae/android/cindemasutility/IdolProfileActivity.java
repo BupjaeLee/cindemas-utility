@@ -29,23 +29,24 @@ import android.widget.SimpleCursorAdapter;
 import com.androidquery.AQuery;
 
 public class IdolProfileActivity extends ActionBarActivity {
+    @SuppressWarnings("UnusedDeclaration")
+    private static final String TAG = IdolProfileActivity.class.getSimpleName();
     public static final String ACTION_CARD_ID_CHANGED = "bupjae.android.cindemasutility.action.CARD_ID_CHANGED";
     public static final String EXTRA_CARD_ID = IdolSelectActivity.EXTRA_CARD_ID;
 
     private AQuery aq;
     private Menu menu;
 
-    private ContentValues cardData;
-    private ContentValues evolveData;
-
     private long cardId;
+    private long evolveFrom;
+    private long evolveTo;
 
     private LoaderManager.LoaderCallbacks<Cursor> cursorCallback = new LoaderManager.LoaderCallbacks<Cursor>() {
         @Override
         public Loader<Cursor> onCreateLoader(int i, Bundle bundle) {
             switch (i) {
                 case 0:
-                    return new CursorLoader(IdolProfileActivity.this, Uri.parse("content://bupjae.android.cindemasutility.card/base/" + cardId), null, null, null, null);
+                    return new CursorLoader(IdolProfileActivity.this, Uri.parse("content://bupjae.android.cindemasutility.card/base/" + cardId), new String[]{"card_name"}, null, null, null);
                 case 1:
                     return new CursorLoader(IdolProfileActivity.this, Uri.parse("content://bupjae.android.cindemasutility.card/evolve/" + cardId), null, null, null, null);
                 default:
@@ -57,25 +58,14 @@ public class IdolProfileActivity extends ActionBarActivity {
         public void onLoadFinished(Loader<Cursor> cursorLoader, Cursor cursor) {
             switch (cursorLoader.getId()) {
                 case 0:
-                    if (cursor.moveToNext()) {
-                        cardData = new ContentValues();
-                        DatabaseUtils.cursorRowToContentValues(cursor, cardData);
-
-                        // TODO: use AQuery.image when AQuery supports ContentProvider URI
-                        aq.id(R.id.info_icon).getImageView().setImageURI(Uri.parse(cardData.getAsString("icon_uri")));
-                        aq.id(R.id.info_name).text(cardData.getAsString("card_name"));
-                        aq.id(R.id.info_rarity).text(cardData.getAsString("rarity"));
-                        aq.id(R.id.info_cost).text(cardData.getAsString("cost"));
-                        aq.id(R.id.info_maxlevel).text(cardData.getAsString("max_level"));
-                        aq.id(R.id.info_maxattack).text(String.format("%d (%.2f)", cardData.getAsInteger("max_attack"), cardData.getAsDouble("rate_attack")));
-                        aq.id(R.id.info_maxdefense).text(String.format("%d (%.2f)", cardData.getAsInteger("max_defense"), cardData.getAsDouble("rate_defense")));
+                    if (cursor.moveToFirst()) {
+                        aq.id(R.id.info_name).text(cursor.getString(0));
                     }
                     break;
                 case 1:
-                    if (cursor.moveToNext()) {
-                        evolveData = new ContentValues();
-                        DatabaseUtils.cursorRowToContentValues(cursor, evolveData);
-
+                    if (cursor.moveToFirst()) {
+                        evolveFrom = cursor.getLong(cursor.getColumnIndexOrThrow("evo_before_id"));
+                        evolveTo = cursor.getLong(cursor.getColumnIndexOrThrow("evo_after_id"));
                         onPrepareOptionsMenu(menu);
                     }
                     break;
@@ -113,6 +103,8 @@ public class IdolProfileActivity extends ActionBarActivity {
                 arg.putLong(EXTRA_CARD_ID, cardId);
                 switch (position) {
                     case 0:
+                        return Fragment.instantiate(IdolProfileActivity.this, BasicProfileFragment.class.getName(), arg);
+                    case 1:
                         return Fragment.instantiate(IdolProfileActivity.this, CommentFragment.class.getName(), arg);
                     default:
                         return null;
@@ -121,13 +113,15 @@ public class IdolProfileActivity extends ActionBarActivity {
 
             @Override
             public int getCount() {
-                return 1;
+                return 2;
             }
 
             @Override
             public CharSequence getPageTitle(int position) {
                 switch (position) {
                     case 0:
+                        return "Basic";
+                    case 1:
                         return "Comments";
                     default:
                         return super.getPageTitle(position);
@@ -149,40 +143,102 @@ public class IdolProfileActivity extends ActionBarActivity {
     @Override
     public boolean onPrepareOptionsMenu(Menu menu) {
         super.onPrepareOptionsMenu(menu);
-        if (menu == null || evolveData == null) return true;
-
-
-        menu.findItem(R.id.action_before_awake).setEnabled(evolveData.getAsLong("evo_before_id") != 0);
-        menu.findItem(R.id.action_after_awake).setEnabled(evolveData.getAsLong("evo_after_id") != 0);
-
-
+        if (menu == null) return true;
+        menu.findItem(R.id.action_before_awake).setEnabled(evolveFrom != 0);
+        menu.findItem(R.id.action_after_awake).setEnabled(evolveTo != 0);
         return true;
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
-
         if (id == R.id.action_before_awake) {
-            changeCard(evolveData.getAsLong("evo_before_id"));
+            changeCard(evolveFrom);
             return true;
         }
         if (id == R.id.action_after_awake) {
-            changeCard(evolveData.getAsLong("evo_after_id"));
+            changeCard(evolveTo);
             return true;
         }
         return super.onOptionsItemSelected(item);
     }
 
-    public void onIconClicked(View view) {
-        Intent intent = new Intent(Intent.ACTION_VIEW);
-        Uri uri = Uri.parse("content://bupjae.android.cindemasutility.card/image/l/" + cardData.getAsString("card_id"));
-        intent.setDataAndType(uri, getContentResolver().getType(uri));
-        intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-        startActivity(intent);
+    public static class BasicProfileFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor> {
+        private AQuery aq;
+
+        private long cardId;
+
+        private BroadcastReceiver receiver = new BroadcastReceiver() {
+            @Override
+            public void onReceive(Context context, Intent intent) {
+                cardId = intent.getLongExtra(EXTRA_CARD_ID, 0);
+                getLoaderManager().restartLoader(0, null, BasicProfileFragment.this);
+            }
+        };
+
+        @Nullable
+        @Override
+        public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+            View root = inflater.inflate(R.layout.fragment_idol_basic_profile, container, false);
+            aq = new AQuery(root);
+            if (savedInstanceState != null) {
+                cardId = savedInstanceState.getLong(EXTRA_CARD_ID);
+            } else {
+                cardId = getArguments().getLong(EXTRA_CARD_ID);
+            }
+            return root;
+        }
+
+        @Override
+        public void onActivityCreated(Bundle savedInstanceState) {
+            super.onActivityCreated(savedInstanceState);
+
+            getLoaderManager().restartLoader(0, null, this);
+        }
+
+
+        @Override
+        public Loader<Cursor> onCreateLoader(int id, Bundle args) {
+            return new CursorLoader(getActivity(), Uri.parse("content://bupjae.android.cindemasutility.card/base/" + cardId), null, null, null, null);
+        }
+
+        @Override
+        public void onLoadFinished(Loader<Cursor> loader, Cursor cursor) {
+            if (cursor.moveToFirst()) {
+                ContentValues cardData = new ContentValues();
+                DatabaseUtils.cursorRowToContentValues(cursor, cardData);
+                aq.id(R.id.info_card_image).getImageView().setImageURI(Uri.parse(cardData.getAsString("image_uri")));
+                aq.id(R.id.info_rarity).text(cardData.getAsString("rarity"));
+                aq.id(R.id.info_cost).text(cardData.getAsString("cost"));
+                aq.id(R.id.info_maxlevel).text(cardData.getAsString("max_level"));
+                aq.id(R.id.info_maxattack).text(String.format("%d (%.2f)", cardData.getAsInteger("max_attack"), cardData.getAsDouble("rate_attack")));
+                aq.id(R.id.info_maxdefense).text(String.format("%d (%.2f)", cardData.getAsInteger("max_defense"), cardData.getAsDouble("rate_defense")));
+            }
+        }
+
+        @Override
+        public void onStart() {
+            super.onStart();
+            IntentFilter filter = new IntentFilter();
+            filter.addAction(ACTION_CARD_ID_CHANGED);
+            LocalBroadcastManager.getInstance(getActivity()).registerReceiver(receiver, filter);
+        }
+
+        @Override
+        public void onStop() {
+            super.onStop();
+            LocalBroadcastManager.getInstance(getActivity()).unregisterReceiver(receiver);
+        }
+
+        @Override
+        public void onSaveInstanceState(Bundle outState) {
+            super.onSaveInstanceState(outState);
+            outState.putLong(EXTRA_CARD_ID, cardId);
+        }
+
+        @Override
+        public void onLoaderReset(Loader<Cursor> loader) {
+        }
     }
 
     public static class CommentFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor> {

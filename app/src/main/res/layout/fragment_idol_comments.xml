@@ -3,9 +3,10 @@
     android:id="@+id/info_comments"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical">
+    android:orientation="vertical"
+    android:paddingTop="20dp">
 
-    <CheckBox
+<CheckBox
         android:id="@+id/show_secret_comments"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"

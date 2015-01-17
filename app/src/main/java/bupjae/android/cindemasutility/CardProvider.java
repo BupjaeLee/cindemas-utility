@@ -157,7 +157,8 @@ public class CardProvider extends ContentProvider {
                         "stat.max_final_defense AS max_defense, " +
                         "CAST(stat.max_final_attack AS REAL) / CAST(card_data.cost AS REAL) AS rate_attack, " +
                         "CAST(stat.max_final_defense AS REAL) / CAST(card_data.cost AS REAL) AS rate_defense," +
-                        "'content://bupjae.android.cindemasutility.card/image/xs/' || card_data.card_id AS icon_uri  " +
+                        "'content://bupjae.android.cindemasutility.card/image/xs/' || card_data.card_id AS icon_uri," +
+                        "'content://bupjae.android.cindemasutility.card/image/l/' || card_data.card_id AS image_uri " +
                         "FROM card_data LEFT JOIN stat ON card_data.card_id = stat.card_id");
                 db.execSQL("CREATE TEMP VIEW evolve AS SELECT " +
                         "c1.card_id AS card_id, " +
