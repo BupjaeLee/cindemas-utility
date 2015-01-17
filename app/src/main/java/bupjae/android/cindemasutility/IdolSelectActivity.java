@@ -9,8 +9,9 @@ import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
+import android.support.v7.widget.SearchView;
+import android.util.Log;
 import android.view.Menu;
-import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.CursorAdapter;
@@ -19,21 +20,27 @@ import android.widget.SimpleCursorAdapter;
 import com.androidquery.AQuery;
 
 public class IdolSelectActivity extends ActionBarActivity {
+    @SuppressWarnings("UnusedDeclaration")
+    private static final String TAG = IdolSelectActivity.class.getSimpleName();
     public static final String EXTRA_CARD_ID = "bupjae.android.cindemasutility.extra.CARD_ID";
 
     private AQuery aq;
     private CursorAdapter adapter;
+    private String query;
 
     private LoaderManager.LoaderCallbacks<Cursor> cursorCallback = new LoaderManager.LoaderCallbacks<Cursor>() {
         @Override
         public Loader<Cursor> onCreateLoader(int i, Bundle bundle) {
             switch (i) {
                 case 0:
+                    if (query == null) query = "";
                     return new CursorLoader(
                             IdolSelectActivity.this,
                             Uri.parse("content://bupjae.android.cindemasutility.card/base"),
                             new String[]{"*", "card_id AS _id"},
-                            null, null, null);
+                            "card_name GLOB ?",
+                            new String[]{"*" + query + "*"},
+                            null);
                 default:
                     throw new IllegalArgumentException("Wrong ID: " + i);
             }
@@ -94,24 +101,36 @@ public class IdolSelectActivity extends ActionBarActivity {
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.menu_idol_select, menu);
+
+        SearchView searchView = (SearchView) menu.findItem(R.id.search).getActionView();
+        searchView.setQueryHint(getResources().getString(R.string.search_hint));
+        searchView.setOnCloseListener(new SearchView.OnCloseListener() {
+            @Override
+            public boolean onClose() {
+                Log.d(TAG, "Test");
+                return false;
+            }
+        });
+        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+            @Override
+            public boolean onQueryTextSubmit(String s) {
+                s = s.trim();
+                query = s;
+                getLoaderManager().restartLoader(0, null, cursorCallback);
+                return false;
+            }
+
+            @Override
+            public boolean onQueryTextChange(String s) {
+                s = s.trim();
+                query = s;
+                getLoaderManager().restartLoader(0, null, cursorCallback);
+                return true;
+            }
+        });
+
         return true;
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
-        int id = item.getItemId();
-
-        //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
-            return true;
-        }
-
-        return super.onOptionsItemSelected(item);
     }
 
     @SuppressWarnings("UnusedDeclaration")

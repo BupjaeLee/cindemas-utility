@@ -15,4 +15,6 @@
     <string name="info_maxattack">MATK:</string>
     <string name="info_maxdefense">MDEF:</string>
     <string name="show_secret_comments">Show secret comments</string>
+    <string name="search_title">Search</string>
+    <string name="search_hint">Idol name</string>
 </resources>
