@@ -8,8 +8,8 @@
     <string name="info_rarity">Rarity:</string>
     <string name="info_cost">Cost:</string>
     <string name="info_maxlevel">Max level:</string>
-    <string name="before_awake">Before awake\n%s</string>
-    <string name="after_awake">After awake\n%s</string>
+    <string name="before_awake">Before awake</string>
+    <string name="after_awake">After awake</string>
     <string name="info_icon">idol icon</string>
     <string name="waiting_message">Preparing database\nPlease wait</string>
     <string name="info_maxattack">MATK:</string>
