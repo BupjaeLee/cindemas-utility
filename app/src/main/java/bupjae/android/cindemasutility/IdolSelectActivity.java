@@ -95,7 +95,7 @@ public class IdolSelectActivity extends ActionBarActivity {
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.menu_idol_list, menu);
+        getMenuInflater().inflate(R.menu.menu_idol_select, menu);
         return true;
     }
 

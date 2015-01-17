@@ -29,11 +29,14 @@ import android.widget.SimpleCursorAdapter;
 import com.androidquery.AQuery;
 
 public class IdolProfileActivity extends ActionBarActivity {
-    public static final String ACTION_CARDID_CHANGED = "bupjae.android.cindemasutility.action.CARDID_CHANGED";
+    public static final String ACTION_CARD_ID_CHANGED = "bupjae.android.cindemasutility.action.CARD_ID_CHANGED";
     public static final String EXTRA_CARD_ID = IdolSelectActivity.EXTRA_CARD_ID;
 
     private AQuery aq;
+    private Menu menu;
+
     private ContentValues cardData;
+    private ContentValues evolveData;
 
     private long cardId;
 
@@ -70,30 +73,10 @@ public class IdolProfileActivity extends ActionBarActivity {
                     break;
                 case 1:
                     if (cursor.moveToNext()) {
-                        ContentValues evolveData = new ContentValues();
+                        evolveData = new ContentValues();
                         DatabaseUtils.cursorRowToContentValues(cursor, evolveData);
 
-                        final long before = evolveData.getAsLong("evo_before_id");
-                        aq.id(R.id.before_awake)
-                                .visibility(before == 0 ? View.INVISIBLE : View.VISIBLE)
-                                .text(R.string.before_awake, evolveData.getAsString("evo_before_name"))
-                                .clicked(new View.OnClickListener() {
-                                    @Override
-                                    public void onClick(View v) {
-                                        if (before != 0) reloadCursor(before);
-                                    }
-                                });
-
-                        final long after = evolveData.getAsLong("evo_after_id");
-                        aq.id(R.id.after_awake)
-                                .visibility(after == 0 ? View.INVISIBLE : View.VISIBLE)
-                                .text(R.string.after_awake, evolveData.getAsString("evo_after_name"))
-                                .clicked(new View.OnClickListener() {
-                                    @Override
-                                    public void onClick(View v) {
-                                        if (after != 0) reloadCursor(after);
-                                    }
-                                });
+                        onPrepareOptionsMenu(menu);
                     }
                     break;
             }
@@ -104,14 +87,15 @@ public class IdolProfileActivity extends ActionBarActivity {
         }
     };
 
-    private void reloadCursor(long cardId) {
+    private void changeCard(long cardId) {
+        if (cardId == 0) return;
         this.cardId = cardId;
         LoaderManager manager = getLoaderManager();
         for (int i = 0; i < 2; i++) {
             manager.restartLoader(i, null, cursorCallback);
         }
 
-        Intent intent = new Intent(ACTION_CARDID_CHANGED);
+        Intent intent = new Intent(ACTION_CARD_ID_CHANGED);
         intent.putExtra(EXTRA_CARD_ID, cardId);
         LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
     }
@@ -151,13 +135,27 @@ public class IdolProfileActivity extends ActionBarActivity {
             }
         });
 
-        reloadCursor(getIntent().getLongExtra(EXTRA_CARD_ID, 0));
+        changeCard(getIntent().getLongExtra(EXTRA_CARD_ID, 0));
     }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.menu_detail, menu);
+        getMenuInflater().inflate(R.menu.menu_idol_profile, menu);
+        this.menu = menu;
+        return true;
+    }
+
+    @Override
+    public boolean onPrepareOptionsMenu(Menu menu) {
+        super.onPrepareOptionsMenu(menu);
+        if (menu == null || evolveData == null) return true;
+
+
+        menu.findItem(R.id.action_before_awake).setEnabled(evolveData.getAsLong("evo_before_id") != 0);
+        menu.findItem(R.id.action_after_awake).setEnabled(evolveData.getAsLong("evo_after_id") != 0);
+
+
         return true;
     }
 
@@ -168,11 +166,14 @@ public class IdolProfileActivity extends ActionBarActivity {
         // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
 
-        //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
+        if (id == R.id.action_before_awake) {
+            changeCard(evolveData.getAsLong("evo_before_id"));
             return true;
         }
-
+        if (id == R.id.action_after_awake) {
+            changeCard(evolveData.getAsLong("evo_after_id"));
+            return true;
+        }
         return super.onOptionsItemSelected(item);
     }
 
@@ -237,7 +238,7 @@ public class IdolProfileActivity extends ActionBarActivity {
         public void onStart() {
             super.onStart();
             IntentFilter filter = new IntentFilter();
-            filter.addAction(ACTION_CARDID_CHANGED);
+            filter.addAction(ACTION_CARD_ID_CHANGED);
             LocalBroadcastManager.getInstance(getActivity()).registerReceiver(receiver, filter);
         }
 
@@ -279,7 +280,5 @@ public class IdolProfileActivity extends ActionBarActivity {
         public void onLoaderReset(Loader<Cursor> loader) {
             commentsAdaptor.swapCursor(null);
         }
-
-
     }
 }

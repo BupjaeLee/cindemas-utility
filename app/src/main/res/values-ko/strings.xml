@@ -6,8 +6,8 @@
     <string name="info_rarity">레어도:</string>
     <string name="info_cost">코스트:</string>
     <string name="info_maxlevel">최대레벨:</string>
-    <string name="before_awake">특훈전\n%s</string>
-    <string name="after_awake">특훈후\n%s</string>
+    <string name="before_awake">특훈전</string>
+    <string name="after_awake">특훈후</string>
     <string name="info_icon">아이돌 아이콘</string>
     <string name="waiting_message">데이터 준비중입니다.\n잠시만 기다려 주세요.\n\n첫 실행이거나 추가된 아이돌이 있을 경우\n시간이 걸릴 수 있습니다.</string>
     <string name="show_secret_comments">모든 대사 표시 (스포일링 주의)</string>

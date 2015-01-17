@@ -162,9 +162,7 @@ public class CardProvider extends ContentProvider {
                 db.execSQL("CREATE TEMP VIEW evolve AS SELECT " +
                         "c1.card_id AS card_id, " +
                         "c1.evo_card_id AS evo_after_id, " +
-                        "c3.card_name AS evo_after_name, " +
                         "IFNULL(c2.card_id, 0) AS evo_before_id, " +
-                        "c2.card_name AS evo_before_name, " +
                         "IFNULL(c2.material_card, 0) AS material_id " +
                         "FROM composition AS c1 " +
                         "LEFT JOIN composition AS c2 ON c1.card_id = c2.evo_card_id " +

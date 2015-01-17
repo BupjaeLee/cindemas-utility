@@ -101,67 +101,7 @@
             </TableRow>
         </TableLayout>
     </LinearLayout>
-    <!--
-        <TabHost
-            android:layout_width="match_parent"
-            android:id="@+id/info_tabs"
-            android:layout_height="0dp"
-            android:layout_weight="1">
-    <LinearLayout
-        android:orientation="vertical"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent">
 
-
-
-            <FrameLayout
-                android:id="@android:id/tabcontent"
-                android:layout_width="match_parent"
-                android:layout_height="0dp"
-                android:layout_weight="1">
-
-                <LinearLayout
-                    android:id="@+id/info_comments"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:orientation="vertical">
-
-                    <CheckBox
-                        android:id="@+id/show_secret_comments"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:text="@string/show_secret_comments" />
-
-                    <ListView
-                        android:id="@+id/comment_list"
-                        android:layout_width="match_parent"
-                        android:layout_height="0dp"
-                        android:layout_weight="1" />
-                </LinearLayout>
-
-                <LinearLayout
-                    android:id="@+id/info_profile"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:orientation="vertical">
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Test contents" />
-                </LinearLayout>
-            </FrameLayout>
-        <TabWidget
-            android:id="@android:id/tabs"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-
-            android:tabStripEnabled="true">
-
-        </TabWidget>
-    </LinearLayout>
-        </TabHost>
-    -->
     <android.support.v4.view.ViewPager
         android:id="@+id/info_tabs"
         android:layout_width="match_parent"
@@ -174,31 +114,4 @@
             android:layout_gravity="top" />
 
     </android.support.v4.view.ViewPager>
-
-    <LinearLayout
-        android:id="@+id/linearLayout"
-        style="?android:attr/buttonBarStyle"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal">
-
-        <Button
-            android:id="@+id/before_awake"
-            style="?android:attr/buttonBarButtonStyle"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:text="@string/before_awake"
-            android:visibility="invisible" />
-
-        <Button
-            android:id="@+id/after_awake"
-            style="?android:attr/buttonBarButtonStyle"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:text="@string/after_awake"
-            android:visibility="invisible" />
-
-    </LinearLayout>
 </LinearLayout>
