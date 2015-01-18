@@ -155,8 +155,8 @@ public class CardProvider extends ContentProvider {
                         "card_data.max_level AS max_level, " +
                         "stat.max_final_attack AS max_attack, " +
                         "stat.max_final_defense AS max_defense, " +
-                        "CAST(stat.max_final_attack AS REAL) / CAST(card_data.cost AS REAL) AS rate_attack, " +
-                        "CAST(stat.max_final_defense AS REAL) / CAST(card_data.cost AS REAL) AS rate_defense," +
+                        "ROUND(CAST(stat.max_final_attack AS REAL) / CAST(card_data.cost AS REAL), 1) AS rate_attack, " +
+                        "ROUND(CAST(stat.max_final_defense AS REAL) / CAST(card_data.cost AS REAL), 1) AS rate_defense," +
                         "'content://bupjae.android.cindemasutility.card/image/xs/' || card_data.card_id AS icon_uri," +
                         "'content://bupjae.android.cindemasutility.card/image/l/' || card_data.card_id AS image_uri " +
                         "FROM card_data LEFT JOIN stat ON card_data.card_id = stat.card_id");

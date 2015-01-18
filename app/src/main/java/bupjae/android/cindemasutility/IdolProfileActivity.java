@@ -211,8 +211,8 @@ public class IdolProfileActivity extends ActionBarActivity {
                 aq.id(R.id.info_rarity).text(cardData.getAsString("rarity"));
                 aq.id(R.id.info_cost).text(cardData.getAsString("cost"));
                 aq.id(R.id.info_maxlevel).text(cardData.getAsString("max_level"));
-                aq.id(R.id.info_maxattack).text(String.format("%d (%.2f)", cardData.getAsInteger("max_attack"), cardData.getAsDouble("rate_attack")));
-                aq.id(R.id.info_maxdefense).text(String.format("%d (%.2f)", cardData.getAsInteger("max_defense"), cardData.getAsDouble("rate_defense")));
+                aq.id(R.id.info_maxattack).text(String.format("%d (%.1f)", cardData.getAsInteger("max_attack"), cardData.getAsDouble("rate_attack")));
+                aq.id(R.id.info_maxdefense).text(String.format("%d (%.1f)", cardData.getAsInteger("max_defense"), cardData.getAsDouble("rate_defense")));
             }
         }
 
