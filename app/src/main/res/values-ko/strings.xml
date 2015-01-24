@@ -13,4 +13,6 @@
     <string name="show_secret_comments">모든 대사 표시 (스포일링 주의)</string>
     <string name="search_title">검색</string>
     <string name="search_hint">아이돌 이름</string>
+    <string name="info_skill">특기:</string>
+    <string name="info_effect">효과:</string>
 </resources>

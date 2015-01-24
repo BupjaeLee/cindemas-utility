@@ -1,88 +1,130 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:orientation="horizontal"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
     android:paddingTop="20dp">
 
-    <ImageView
-        android:id="@+id/info_card_image"
-        android:layout_width="0dp"
-        android:layout_height="match_parent"
-        android:layout_weight="1" />
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:orientation="horizontal">
+
+        <ImageView
+            android:id="@+id/info_card_image"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:contentDescription="@string/description_card_image"
+            android:scaleType="fitCenter"
+            tools:ignore="NestedWeights" />
+
+        <Space
+            android:layout_width="20dp"
+            android:layout_height="match_parent" />
+
+        <TableLayout
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1">
+
+            <TableRow>
+
+                <TextView
+                    style="@style/DetailName"
+                    android:text="@string/info_rarity"
+                    android:textAppearance="?android:attr/textAppearanceMedium" />
+
+                <TextView
+                    android:id="@+id/info_rarity"
+                    style="@style/DetailValue"
+                    android:textAppearance="?android:attr/textAppearanceMedium" />
+            </TableRow>
+
+            <TableRow>
+
+                <TextView
+                    style="@style/DetailName"
+                    android:text="@string/info_cost"
+                    android:textAppearance="?android:attr/textAppearanceMedium" />
+
+                <TextView
+                    android:id="@+id/info_cost"
+                    style="@style/DetailValue"
+                    android:textAppearance="?android:attr/textAppearanceMedium" />
+            </TableRow>
+
+            <TableRow>
+
+                <TextView
+                    style="@style/DetailName"
+                    android:text="@string/info_maxlevel"
+                    android:textAppearance="?android:attr/textAppearanceMedium" />
+
+                <TextView
+                    android:id="@+id/info_maxlevel"
+                    style="@style/DetailValue"
+                    android:textAppearance="?android:attr/textAppearanceMedium" />
+            </TableRow>
+
+            <TableRow>
+
+                <TextView
+                    style="@style/DetailName"
+                    android:text="@string/info_max_attack"
+                    android:textAppearance="?android:attr/textAppearanceMedium" />
+
+                <TextView
+                    android:id="@+id/info_max_attack"
+                    style="@style/DetailValue"
+                    android:textAppearance="?android:attr/textAppearanceMedium" />
+            </TableRow>
+
+            <TableRow>
+
+                <TextView
+                    style="@style/DetailName"
+                    android:text="@string/info_max_defense"
+                    android:textAppearance="?android:attr/textAppearanceMedium" />
+
+                <TextView
+                    android:id="@+id/info_max_defense"
+                    style="@style/DetailValue"
+                    android:textAppearance="?android:attr/textAppearanceMedium" />
+            </TableRow>
+        </TableLayout>
+    </LinearLayout>
 
     <TableLayout
-        android:id="@+id/tableLayout"
-        android:layout_width="0dp"
-        android:layout_height="match_parent"
-        android:layout_marginLeft="20dp"
-        android:layout_marginStart="20dp"
-        android:layout_weight="1">
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
 
         <TableRow>
 
             <TextView
                 style="@style/DetailName"
-                android:text="@string/info_rarity"
+                android:text="@string/info_skill"
                 android:textAppearance="?android:attr/textAppearanceMedium" />
 
             <TextView
-                android:id="@+id/info_rarity"
+                android:id="@+id/info_skill_name"
                 style="@style/DetailValue"
                 android:textAppearance="?android:attr/textAppearanceMedium" />
         </TableRow>
 
-        <TableRow>
+        <TableRow android:id="@+id/info_skill_row">
 
             <TextView
                 style="@style/DetailName"
-                android:text="@string/info_cost"
+                android:text="@string/info_effect"
                 android:textAppearance="?android:attr/textAppearanceMedium" />
 
             <TextView
-                android:id="@+id/info_cost"
-                style="@style/DetailValue"
-                android:textAppearance="?android:attr/textAppearanceMedium" />
-        </TableRow>
-
-        <TableRow>
-
-            <TextView
-                style="@style/DetailName"
-                android:text="@string/info_maxlevel"
-                android:textAppearance="?android:attr/textAppearanceMedium" />
-
-            <TextView
-                android:id="@+id/info_maxlevel"
-                style="@style/DetailValue"
-                android:textAppearance="?android:attr/textAppearanceMedium" />
-        </TableRow>
-
-        <TableRow>
-
-            <TextView
-                style="@style/DetailName"
-                android:text="@string/info_maxattack"
-                android:textAppearance="?android:attr/textAppearanceMedium" />
-
-            <TextView
-                android:id="@+id/info_maxattack"
-                style="@style/DetailValue"
-                android:textAppearance="?android:attr/textAppearanceMedium" />
-        </TableRow>
-
-        <TableRow>
-
-            <TextView
-                style="@style/DetailName"
-                android:text="@string/info_maxdefense"
-                android:textAppearance="?android:attr/textAppearanceMedium" />
-
-            <TextView
-                android:id="@+id/info_maxdefense"
+                android:id="@+id/info_skill_effect"
                 style="@style/DetailValue"
                 android:textAppearance="?android:attr/textAppearanceMedium" />
         </TableRow>
     </TableLayout>
-
 </LinearLayout>

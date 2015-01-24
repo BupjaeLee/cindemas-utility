@@ -211,8 +211,21 @@ public class IdolProfileActivity extends ActionBarActivity {
                 aq.id(R.id.info_rarity).text(cardData.getAsString("rarity"));
                 aq.id(R.id.info_cost).text(cardData.getAsString("cost"));
                 aq.id(R.id.info_maxlevel).text(cardData.getAsString("max_level"));
-                aq.id(R.id.info_maxattack).text(String.format("%d (%.1f)", cardData.getAsInteger("max_attack"), cardData.getAsDouble("rate_attack")));
-                aq.id(R.id.info_maxdefense).text(String.format("%d (%.1f)", cardData.getAsInteger("max_defense"), cardData.getAsDouble("rate_defense")));
+                aq.id(R.id.info_max_attack).text(String.format("%d (%.2f)", cardData.getAsInteger("max_attack"), cardData.getAsDouble("rate_attack")));
+                aq.id(R.id.info_max_defense).text(String.format("%d (%.2f)", cardData.getAsInteger("max_defense"), cardData.getAsDouble("rate_defense")));
+
+                String skillName = cardData.getAsString("skill_name");
+                if (skillName == null || skillName.isEmpty()) {
+                    aq.id(R.id.info_skill_name).text("없음");
+                    aq.id(R.id.info_skill_row).invisible();
+                } else {
+                    aq.id(R.id.info_skill_name).text(skillName);
+                    aq.id(R.id.info_skill_effect).text(
+                            String.format("%s (%d%%~)",
+                                    cardData.getAsString("skill_effect"),
+                                    cardData.getAsInteger("default_skill_effect")));
+                    aq.id(R.id.info_skill_row).visible();
+                }
             }
         }
 

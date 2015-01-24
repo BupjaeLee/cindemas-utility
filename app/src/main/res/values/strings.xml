@@ -12,9 +12,12 @@
     <string name="after_awake">After awake</string>
     <string name="info_icon">idol icon</string>
     <string name="waiting_message">Preparing database\nPlease wait</string>
-    <string name="info_maxattack">MATK:</string>
-    <string name="info_maxdefense">MDEF:</string>
+    <string name="info_max_attack">MATK:</string>
+    <string name="info_max_defense">MDEF:</string>
     <string name="show_secret_comments">Show secret comments</string>
     <string name="search_title">Search</string>
     <string name="search_hint">Idol name</string>
+    <string name="info_skill">Skill:</string>
+    <string name="info_effect">Effect:</string>
+    <string name="info_default_skill_effect">Start Rate:</string>
 </resources>

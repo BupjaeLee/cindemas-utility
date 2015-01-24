@@ -35,6 +35,7 @@ public class CardProvider extends ContentProvider {
     private static final String CARD_COMPOSITION_FILENAME = "data/csv/composition.db";
     private static final String CARD_COMMENTS_FILENAME = "data/csv/card_comments.db";
     private static final String CARD_BIRTHDAY_FILENAME = "data/csv/idol_birthday.db";
+    private static final String CARD_SKILLDATA_FILENAME = "data/csv/skill_data.db";
     private static final String CARD_IMAGE_DIR = "images/card";
 
     private static final int CODE_BASE = 1;
@@ -135,6 +136,7 @@ public class CardProvider extends ContentProvider {
                 db.execSQL("ATTACH DATABASE ? AS composition", new Object[]{new File(baseDir, CARD_COMPOSITION_FILENAME).toString()});
                 db.execSQL("ATTACH DATABASE ? AS card_comments", new Object[]{new File(baseDir, CARD_COMMENTS_FILENAME).toString()});
                 db.execSQL("ATTACH DATABASE ? AS idol_birthday", new Object[]{new File(baseDir, CARD_BIRTHDAY_FILENAME).toString()});
+                db.execSQL("ATTACH DATABASE ? AS skill_data", new Object[]{new File(baseDir, CARD_SKILLDATA_FILENAME).toString()});
                 db.execSQL("CREATE TEMP VIEW base AS SELECT " +
                         "card_data.card_id AS card_id, " +
                         "card_data.card_name AS card_name, " +
@@ -155,11 +157,16 @@ public class CardProvider extends ContentProvider {
                         "card_data.max_level AS max_level, " +
                         "stat.max_final_attack AS max_attack, " +
                         "stat.max_final_defense AS max_defense, " +
-                        "ROUND(CAST(stat.max_final_attack AS REAL) / CAST(card_data.cost AS REAL), 1) AS rate_attack, " +
-                        "ROUND(CAST(stat.max_final_defense AS REAL) / CAST(card_data.cost AS REAL), 1) AS rate_defense," +
-                        "'content://bupjae.android.cindemasutility.card/image/xs/' || card_data.card_id AS icon_uri," +
-                        "'content://bupjae.android.cindemasutility.card/image/l/' || card_data.card_id AS image_uri " +
-                        "FROM card_data LEFT JOIN stat ON card_data.card_id = stat.card_id");
+                        "ROUND(CAST(stat.max_final_attack AS REAL) / CAST(card_data.cost AS REAL), 2) AS rate_attack, " +
+                        "ROUND(CAST(stat.max_final_defense AS REAL) / CAST(card_data.cost AS REAL), 2) AS rate_defense, " +
+                        "'content://bupjae.android.cindemasutility.card/image/xs/' || card_data.card_id AS icon_uri, " +
+                        "'content://bupjae.android.cindemasutility.card/image/l/' || card_data.card_id AS image_uri, " +
+                        "card_data.skill_name AS skill_name, " +
+                        "REPLACE(card_data.skill_effect, '\\n', ' ') AS skill_effect, " +
+                        "skill_data.default_skill_effect AS default_skill_effect " +
+                        "FROM card_data " +
+                        "LEFT JOIN stat ON card_data.card_id = stat.card_id " +
+                        "LEFT JOIN skill_data ON card_data.skill_id = skill_data.skill_id");
                 db.execSQL("CREATE TEMP VIEW evolve AS SELECT " +
                         "c1.card_id AS card_id, " +
                         "c1.evo_card_id AS evo_after_id, " +
