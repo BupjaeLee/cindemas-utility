@@ -3,12 +3,12 @@
     xmlns:tools="http://schemas.android.com/tools"
     tools:context="bupjae.android.cindemasutility.IdolProfileActivity">
     <item
-        android:id="@+id/action_before_awake"
+        android:id="@+id/action_before_evolve"
         android:icon="@android:drawable/ic_media_rew"
         android:title="@string/before_awake"
         app:showAsAction="ifRoom|withText" />
     <item
-        android:id="@+id/action_after_awake"
+        android:id="@+id/action_after_evolve"
         android:icon="@android:drawable/ic_media_ff"
         android:title="@string/after_awake"
         app:showAsAction="ifRoom|withText" />

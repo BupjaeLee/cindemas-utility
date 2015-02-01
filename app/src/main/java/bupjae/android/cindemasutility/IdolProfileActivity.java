@@ -144,19 +144,23 @@ public class IdolProfileActivity extends ActionBarActivity {
     public boolean onPrepareOptionsMenu(Menu menu) {
         super.onPrepareOptionsMenu(menu);
         if (menu == null) return true;
-        menu.findItem(R.id.action_before_awake).setEnabled(evolveFrom != 0);
-        menu.findItem(R.id.action_after_awake).setEnabled(evolveTo != 0);
+        menu.findItem(R.id.action_before_evolve)
+                .setEnabled(evolveFrom != 0)
+                .getIcon().setAlpha(evolveFrom != 0 ? 255 : 64);
+        menu.findItem(R.id.action_after_evolve)
+                .setEnabled(evolveTo != 0)
+                .getIcon().setAlpha(evolveTo != 0 ? 255 : 64);
         return true;
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
-        if (id == R.id.action_before_awake) {
+        if (id == R.id.action_before_evolve) {
             changeCard(evolveFrom);
             return true;
         }
-        if (id == R.id.action_after_awake) {
+        if (id == R.id.action_after_evolve) {
             changeCard(evolveTo);
             return true;
         }
