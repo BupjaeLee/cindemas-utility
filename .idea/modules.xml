@@ -3,7 +3,6 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/CindemasUtility.iml" filepath="$PROJECT_DIR$/CindemasUtility.iml" />
-      <module fileurl="file://$PROJECT_DIR$/android-query.0.26.8/android-query.0.26.8.iml" filepath="$PROJECT_DIR$/android-query.0.26.8/android-query.0.26.8.iml" />
       <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
     </modules>
   </component>

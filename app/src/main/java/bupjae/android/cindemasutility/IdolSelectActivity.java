@@ -8,18 +8,17 @@ import android.content.Loader;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
-import android.support.v7.app.ActionBarActivity;
-import android.support.v7.widget.SearchView;
 import android.util.Log;
 import android.view.Menu;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.CursorAdapter;
+import android.widget.SearchView;
 import android.widget.SimpleCursorAdapter;
 
 import com.androidquery.AQuery;
 
-public class IdolSelectActivity extends ActionBarActivity {
+public class IdolSelectActivity extends Activity {
     @SuppressWarnings("UnusedDeclaration")
     private static final String TAG = IdolSelectActivity.class.getSimpleName();
     public static final String EXTRA_CARD_ID = "bupjae.android.cindemasutility.extra.CARD_ID";

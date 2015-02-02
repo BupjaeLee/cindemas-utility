@@ -1,5 +1,7 @@
 package bupjae.android.cindemasutility;
 
+import android.app.ActionBar;
+import android.app.Activity;
 import android.app.Fragment;
 import android.app.LoaderManager;
 import android.content.BroadcastReceiver;
@@ -17,7 +19,6 @@ import android.support.annotation.Nullable;
 import android.support.v13.app.FragmentPagerAdapter;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v4.view.PagerAdapter;
-import android.support.v7.app.ActionBarActivity;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -28,13 +29,12 @@ import android.widget.SimpleCursorAdapter;
 
 import com.androidquery.AQuery;
 
-public class IdolProfileActivity extends ActionBarActivity {
+public class IdolProfileActivity extends Activity {
     @SuppressWarnings("UnusedDeclaration")
     private static final String TAG = IdolProfileActivity.class.getSimpleName();
     public static final String ACTION_CARD_ID_CHANGED = "bupjae.android.cindemasutility.action.CARD_ID_CHANGED";
     public static final String EXTRA_CARD_ID = IdolSelectActivity.EXTRA_CARD_ID;
 
-    private AQuery aq;
     private Menu menu;
 
     private long cardId;
@@ -59,7 +59,8 @@ public class IdolProfileActivity extends ActionBarActivity {
             switch (cursorLoader.getId()) {
                 case 0:
                     if (cursor.moveToFirst()) {
-                        aq.id(R.id.info_name).text(cursor.getString(0));
+                        ActionBar actionBar = getActionBar();
+                        if (actionBar != null) actionBar.setTitle(cursor.getString(0));
                     }
                     break;
                 case 1:
@@ -94,7 +95,7 @@ public class IdolProfileActivity extends ActionBarActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_idol_profile);
-        aq = new AQuery(this);
+        AQuery aq = new AQuery(this);
 
         aq.id(R.id.info_tabs).invoke("setAdapter", new Class<?>[]{PagerAdapter.class}, new FragmentPagerAdapter(getFragmentManager()) {
             @Override

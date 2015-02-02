@@ -9,7 +9,6 @@
         <option name="modules">
           <set>
             <option value="$PROJECT_DIR$" />
-            <option value="$PROJECT_DIR$/android-query.0.26.8" />
             <option value="$PROJECT_DIR$/app" />
           </set>
         </option>
