@@ -20,4 +20,5 @@
     <string name="info_skill">Skill:</string>
     <string name="info_effect">Effect:</string>
     <string name="info_default_skill_effect">Start Rate:</string>
+    <string name="producer_name">Producer name</string>
 </resources>

@@ -15,4 +15,5 @@
     <string name="search_hint">아이돌 이름</string>
     <string name="info_skill">특기:</string>
     <string name="info_effect">효과:</string>
+    <string name="producer_name">프로듀서 이름</string>
 </resources>

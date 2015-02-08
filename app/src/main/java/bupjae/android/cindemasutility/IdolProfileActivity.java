@@ -11,6 +11,7 @@ import android.content.CursorLoader;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.Loader;
+import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.database.DatabaseUtils;
 import android.net.Uri;
@@ -260,13 +261,13 @@ public class IdolProfileActivity extends Activity {
     }
 
     public static class CommentFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor> {
-        private static final String SHOW_SECRET_COMMENTS = "bupjae.android.cindemasutility.SHOW_SECRET_COMMENTS";
 
         private AQuery aq;
         private CursorAdapter commentsAdaptor;
 
         private long cardId;
         private boolean showSecretComments;
+        private String producerName;
 
         private BroadcastReceiver receiver = new BroadcastReceiver() {
             @Override
@@ -283,8 +284,6 @@ public class IdolProfileActivity extends Activity {
             aq = new AQuery(root);
             if (savedInstanceState != null) {
                 cardId = savedInstanceState.getLong(EXTRA_CARD_ID);
-                showSecretComments = savedInstanceState.getBoolean(SHOW_SECRET_COMMENTS);
-                aq.id(R.id.show_secret_comments).checked(showSecretComments);
             } else {
                 cardId = getArguments().getLong(EXTRA_CARD_ID);
             }
@@ -295,6 +294,8 @@ public class IdolProfileActivity extends Activity {
         public void onActivityCreated(Bundle savedInstanceState) {
             super.onActivityCreated(savedInstanceState);
 
+            SharedPreferences preference = getActivity().getPreferences(MODE_PRIVATE);
+
             commentsAdaptor = new SimpleCursorAdapter(
                     getActivity(),
                     android.R.layout.simple_list_item_2,
@@ -303,7 +304,12 @@ public class IdolProfileActivity extends Activity {
                     new int[]{android.R.id.text1, android.R.id.text2},
                     0);
             aq.id(R.id.comment_list).adapter(commentsAdaptor);
-            aq.id(R.id.show_secret_comments).clicked(this, "onShowSecretClicked");
+            aq.id(R.id.producer_name)
+                    .text(producerName = preference.getString("producer_name", ""))
+                    .textChanged(this, "onProducerNameChanged");
+            aq.id(R.id.show_secret_comments)
+                    .checked(showSecretComments = preference.getBoolean("show_secret_comments", false))
+                    .clicked(this, "onShowSecretClicked");
 
             getLoaderManager().restartLoader(0, null, this);
         }
@@ -325,13 +331,20 @@ public class IdolProfileActivity extends Activity {
         @Override
         public void onSaveInstanceState(Bundle outState) {
             super.onSaveInstanceState(outState);
-            outState.putBoolean(SHOW_SECRET_COMMENTS, showSecretComments);
             outState.putLong(EXTRA_CARD_ID, cardId);
         }
 
         @SuppressWarnings("UnusedDeclaration")
         public void onShowSecretClicked(View view) {
             showSecretComments = aq.id(R.id.show_secret_comments).isChecked();
+            getActivity().getPreferences(MODE_PRIVATE).edit().putBoolean("show_secret_comments", showSecretComments).apply();
+            getLoaderManager().restartLoader(0, null, this);
+        }
+
+        @SuppressWarnings("UnusedDeclaration")
+        public void onProducerNameChanged(CharSequence s, int start, int before, int count) {
+            producerName = aq.id(R.id.producer_name).getText().toString();
+            getActivity().getPreferences(MODE_PRIVATE).edit().putString("producer_name", producerName).apply();
             getLoaderManager().restartLoader(0, null, this);
         }
 
@@ -340,9 +353,10 @@ public class IdolProfileActivity extends Activity {
             return new CursorLoader(
                     getActivity(),
                     Uri.parse("content://bupjae.android.cindemasutility.card/comments/" + cardId),
-                    new String[]{"*", "card_id*100+kind_id AS _id"},
+                    new String[]{"kind_id AS _id", "comments_kind", "REPLACE(comments_value, '%s', ?) AS comments_value"},
                     showSecretComments ? null : "secret = 0",
-                    null, null);
+                    new String[]{producerName == null || producerName.isEmpty() ? "(프로듀서)" : producerName},
+                    null);
         }
 
         @Override
