@@ -6,6 +6,7 @@ import android.content.UriMatcher;
 import android.database.Cursor;
 import android.database.DatabaseUtils;
 import android.database.MatrixCursor;
+import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.net.Uri;
@@ -36,6 +37,7 @@ public class CardProvider extends ContentProvider {
     private static final String CARD_COMMENTS_FILENAME = "data/csv/card_comments.db";
     private static final String CARD_BIRTHDAY_FILENAME = "data/csv/idol_birthday.db";
     private static final String CARD_SKILLDATA_FILENAME = "data/csv/skill_data.db";
+    private static final String CARD_VCOMMENT_FILENAME = "data/csv/v_comment.db";
     private static final String CARD_IMAGE_DIR = "images/card";
 
     private static final int CODE_BASE = 1;
@@ -137,6 +139,11 @@ public class CardProvider extends ContentProvider {
                 db.execSQL("ATTACH DATABASE ? AS card_comments", new Object[]{new File(baseDir, CARD_COMMENTS_FILENAME).toString()});
                 db.execSQL("ATTACH DATABASE ? AS idol_birthday", new Object[]{new File(baseDir, CARD_BIRTHDAY_FILENAME).toString()});
                 db.execSQL("ATTACH DATABASE ? AS skill_data", new Object[]{new File(baseDir, CARD_SKILLDATA_FILENAME).toString()});
+                try {
+                    db.execSQL("ATTACH DATABASE ? AS v_comment", new Object[]{new File(baseDir, CARD_VCOMMENT_FILENAME).toString()});
+                } catch (SQLException ex) {
+                    db.execSQL("CREATE TEMP TABLE v_comment(card_id, card_name, v_comments)");
+                }
                 db.execSQL("CREATE TEMP VIEW base AS SELECT " +
                         "card_data.card_id AS card_id, " +
                         "card_data.card_name AS card_name, " +
@@ -192,7 +199,8 @@ public class CardProvider extends ContentProvider {
                         "UNION SELECT card_id, 13 AS kind_id, 'love_max' AS comments_kind, comments_love_max AS comments_value, 1 AS secret FROM card_comments " +
                         "UNION SELECT card_id, 14 AS kind_id, 'birthday1' AS comments_kind, comment1 AS comment_value, 1 AS secret FROM idol_birthday " +
                         "UNION SELECT card_id, 15 AS kind_id, 'birthday2' AS comments_kind, comment2 AS comment_value, 1 AS secret FROM idol_birthday " +
-                        "UNION SELECT card_id, 16 AS kind_id, 'birthday3' AS comments_kind, comment3 AS comment_value, 1 AS secret FROM idol_birthday");
+                        "UNION SELECT card_id, 16 AS kind_id, 'birthday3' AS comments_kind, comment3 AS comment_value, 1 AS secret FROM idol_birthday " +
+                        "UNION SELECT card_id, 17 AS kind_id, 'valentine' AS comments_kind, v_comments AS comment_value, 1 AS secret FROM v_comment");
                 db.execSQL("CREATE TEMP VIEW current_stat AS SELECT " +
                         "card_id, " +
                         "max_level=1 AS no_levelup, " +
