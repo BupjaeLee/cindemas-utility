@@ -6,7 +6,6 @@ import android.content.UriMatcher;
 import android.database.Cursor;
 import android.database.DatabaseUtils;
 import android.database.MatrixCursor;
-import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.net.Uri;
@@ -139,9 +138,9 @@ public class CardProvider extends ContentProvider {
                 db.execSQL("ATTACH DATABASE ? AS card_comments", new Object[]{new File(baseDir, CARD_COMMENTS_FILENAME).toString()});
                 db.execSQL("ATTACH DATABASE ? AS idol_birthday", new Object[]{new File(baseDir, CARD_BIRTHDAY_FILENAME).toString()});
                 db.execSQL("ATTACH DATABASE ? AS skill_data", new Object[]{new File(baseDir, CARD_SKILLDATA_FILENAME).toString()});
-                try {
+                if (new File(baseDir, CARD_VCOMMENT_FILENAME).exists()) {
                     db.execSQL("ATTACH DATABASE ? AS v_comment", new Object[]{new File(baseDir, CARD_VCOMMENT_FILENAME).toString()});
-                } catch (SQLException ex) {
+                } else {
                     db.execSQL("CREATE TEMP TABLE v_comment(card_id, card_name, v_comments)");
                 }
                 db.execSQL("CREATE TEMP VIEW base AS SELECT " +
