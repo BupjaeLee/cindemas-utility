@@ -7,4 +7,31 @@
         android:icon="@android:drawable/ic_menu_search"
         android:showAsAction="collapseActionView|ifRoom"
         android:title="@string/search_title" />
+    <item
+        android:icon="@android:drawable/ic_menu_sort_alphabetically"
+        android:showAsAction="ifRoom"
+        android:title="Sort">
+        <menu>
+            <group
+                android:id="@+id/sortby"
+                android:checkableBehavior="single">
+                <item
+                    android:id="@+id/sortby_database"
+                    android:checked="true"
+                    android:title="@string/sortby_database" />
+                <item
+                    android:id="@+id/sortby_atk"
+                    android:title="@string/sortby_atk" />
+                <item
+                    android:id="@+id/sortby_def"
+                    android:title="@string/sortby_def" />
+                <item
+                    android:id="@+id/sortby_atkrate"
+                    android:title="@string/sortby_atkrate" />
+                <item
+                    android:id="@+id/sortby_defrate"
+                    android:title="@string/sortby_defrate" />
+            </group>
+        </menu>
+    </item>
 </menu>

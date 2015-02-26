@@ -8,8 +8,10 @@ import android.content.Loader;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.util.Log;
 import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.CursorAdapter;
@@ -26,6 +28,7 @@ public class IdolSelectActivity extends Activity {
     private AQuery aq;
     private CursorAdapter adapter;
     private String query;
+    private String sortOrder;
 
     private LoaderManager.LoaderCallbacks<Cursor> cursorCallback = new LoaderManager.LoaderCallbacks<Cursor>() {
         @Override
@@ -33,13 +36,14 @@ public class IdolSelectActivity extends Activity {
             switch (i) {
                 case 0:
                     if (query == null) query = "";
+                    if (sortOrder == null) sortOrder = "card_id ASC";
                     return new CursorLoader(
                             IdolSelectActivity.this,
                             Uri.parse("content://bupjae.android.cindemasutility.card/base"),
                             new String[]{"*", "card_id AS _id"},
                             "card_name GLOB ?",
                             new String[]{"*" + query + "*"},
-                            null);
+                            sortOrder);
                 default:
                     throw new IllegalArgumentException("Wrong ID: " + i);
             }
@@ -130,6 +134,40 @@ public class IdolSelectActivity extends Activity {
         });
 
         return true;
+    }
+
+    @Override
+    public boolean onMenuItemSelected(int featureId, @NonNull MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.sortby_database:
+                item.setChecked(true);
+                sortOrder = "card_id ASC";
+                getLoaderManager().restartLoader(0, null, cursorCallback);
+                return true;
+            case R.id.sortby_atk:
+                item.setChecked(true);
+                sortOrder = "max_attack DESC";
+                getLoaderManager().restartLoader(0, null, cursorCallback);
+                return true;
+            case R.id.sortby_def:
+                item.setChecked(true);
+                sortOrder = "max_defense DESC";
+                getLoaderManager().restartLoader(0, null, cursorCallback);
+                return true;
+            case R.id.sortby_atkrate:
+                item.setChecked(true);
+                sortOrder = "rate_attack DESC";
+                getLoaderManager().restartLoader(0, null, cursorCallback);
+                return true;
+            case R.id.sortby_defrate:
+                item.setChecked(true);
+                sortOrder = "rate_defense DESC";
+                getLoaderManager().restartLoader(0, null, cursorCallback);
+                return true;
+            default:
+                return super.onMenuItemSelected(featureId, item);
+        }
+
     }
 
     @SuppressWarnings("UnusedDeclaration")
