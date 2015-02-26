@@ -41,7 +41,7 @@ public class ImageProvider extends FileProvider {
                     if (segments.size() != 3) {
                         throw new IllegalArgumentException("Wrong URI for card: " + uri);
                     }
-                    prepareCardImage(getType(uri), segments.get(1), segments.get(2));
+                    prepareCardImage(segments.get(1), segments.get(2));
                     break;
                 default:
                     throw ex;
@@ -50,7 +50,7 @@ public class ImageProvider extends FileProvider {
         return super.openFile(uri, mode);
     }
 
-    private void prepareCardImage(String mime, String type, String name) throws FileNotFoundException {
+    private void prepareCardImage(String type, String name) throws FileNotFoundException {
         File dir = new File(getContext().getCacheDir(), "images/card/" + type);
         //noinspection ResultOfMethodCallIgnored
         dir.mkdirs();
@@ -59,16 +59,12 @@ public class ImageProvider extends FileProvider {
         byte[] buffer = readFully(original);
 
         byte mask;
-        switch (mime) {
-            case "image/png":
-                mask = (byte) (buffer[0] ^ 137);
-                break;
-            case "image/webp":
-                mask = (byte) (buffer[0] ^ 'R');
-                break;
-            default:
-                mask = 0;
-                break;
+        if (name.endsWith(".png")) {
+            mask = (byte) (buffer[0] ^ 137);
+        } else if (name.endsWith(".webp")) {
+            mask = (byte) (buffer[0] ^ 'R');
+        } else {
+            mask = 0;
         }
         for (int i = 0; i < 50; i++) buffer[i] ^= mask;
 
