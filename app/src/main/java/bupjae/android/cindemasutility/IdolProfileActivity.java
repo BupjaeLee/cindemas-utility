@@ -173,6 +173,7 @@ public class IdolProfileActivity extends Activity {
         private AQuery aq;
 
         private long cardId;
+        private int imageKind;
 
         private BroadcastReceiver receiver = new BroadcastReceiver() {
             @Override
@@ -199,9 +200,22 @@ public class IdolProfileActivity extends Activity {
         public void onActivityCreated(Bundle savedInstanceState) {
             super.onActivityCreated(savedInstanceState);
 
+            SharedPreferences preference = getActivity().getPreferences(MODE_PRIVATE);
+            imageKind = preference.getInt("image_kind", R.id.image_framed);
+
+            aq.id(R.id.image_framed).clicked(this, "onChangeImageKind");
+            aq.id(R.id.image_noframed).clicked(this, "onChangeImageKind");
+            aq.id(imageKind).checked(true);
+
             getLoaderManager().restartLoader(0, null, this);
         }
 
+        @SuppressWarnings("UnusedDeclaration")
+        public void onChangeImageKind(View view) {
+            imageKind = view.getId();
+            getActivity().getPreferences(MODE_PRIVATE).edit().putInt("image_kind", imageKind).apply();
+            getLoaderManager().restartLoader(0, null, this);
+        }
 
         @Override
         public Loader<Cursor> onCreateLoader(int id, Bundle args) {
@@ -213,7 +227,18 @@ public class IdolProfileActivity extends Activity {
             if (cursor.moveToFirst()) {
                 ContentValues cardData = new ContentValues();
                 DatabaseUtils.cursorRowToContentValues(cursor, cardData);
-                aq.id(R.id.info_card_image).getImageView().setImageURI(Uri.parse(cardData.getAsString("image_uri")));
+                Uri imageUri = null;
+                switch (imageKind) {
+                    case R.id.image_framed:
+                        if (cardData.containsKey("image_uri"))
+                            imageUri = Uri.parse(cardData.getAsString("image_uri"));
+                        break;
+                    case R.id.image_noframed:
+                        if (cardData.containsKey("image_noframe_uri"))
+                            imageUri = Uri.parse(cardData.getAsString("image_noframe_uri"));
+                        break;
+                }
+                aq.id(R.id.info_card_image).getImageView().setImageURI(imageUri);
                 aq.id(R.id.info_rarity).text(cardData.getAsString("rarity"));
                 aq.id(R.id.info_cost).text(cardData.getAsString("cost"));
                 aq.id(R.id.info_maxlevel).text(cardData.getAsString("max_level"));

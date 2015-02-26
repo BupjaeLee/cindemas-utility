@@ -26,4 +26,6 @@
     <string name="sortby_def">By DEF</string>
     <string name="sortby_atkrate">By ATK/Cost</string>
     <string name="sortby_defrate">By DEF/Cost</string>
+    <string name="image_framed">Framed</string>
+    <string name="image_noframed">No framed</string>
 </resources>
