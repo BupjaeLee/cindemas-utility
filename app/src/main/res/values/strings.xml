@@ -21,7 +21,7 @@
     <string name="info_effect">Effect:</string>
     <string name="info_default_skill_effect">Start Rate:</string>
     <string name="producer_name">Producer name</string>
-    <string name="sortby_database">By database</string>
+    <string name="sortby_database">No sort</string>
     <string name="sortby_atk">By ATK</string>
     <string name="sortby_def">By DEF</string>
     <string name="sortby_atkrate">By ATK/Cost</string>

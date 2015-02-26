@@ -36,7 +36,7 @@ public class IdolSelectActivity extends Activity {
             switch (i) {
                 case 0:
                     if (query == null) query = "";
-                    if (sortOrder == null) sortOrder = "card_id ASC";
+                    if (sortOrder == null) sortOrder = "";
                     return new CursorLoader(
                             IdolSelectActivity.this,
                             Uri.parse("content://bupjae.android.cindemasutility.card/base"),
@@ -141,7 +141,7 @@ public class IdolSelectActivity extends Activity {
         switch (item.getItemId()) {
             case R.id.sortby_database:
                 item.setChecked(true);
-                sortOrder = "card_id ASC";
+                sortOrder = "";
                 getLoaderManager().restartLoader(0, null, cursorCallback);
                 return true;
             case R.id.sortby_atk:
