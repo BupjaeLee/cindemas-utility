@@ -5,29 +5,15 @@ import android.content.ContentValues;
 import android.content.UriMatcher;
 import android.database.Cursor;
 import android.database.DatabaseUtils;
-import android.database.MatrixCursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.net.Uri;
 import android.os.Environment;
-import android.os.ParcelFileDescriptor;
-import android.provider.OpenableColumns;
 import android.util.Log;
 
-import java.io.ByteArrayOutputStream;
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.util.Arrays;
-import java.util.List;
 
 public class CardProvider extends ContentProvider {
-    // Image type: l, lc, lls, ls, m, s, xl, xs, xs3, xs4, xxs
-
     public static final String AUTHORITY = "bupjae.android.cindemasutility.card";
 
     private static final String TAG = CardProvider.class.getSimpleName();
@@ -37,11 +23,9 @@ public class CardProvider extends ContentProvider {
     private static final String CARD_BIRTHDAY_FILENAME = "data/csv/idol_birthday.db";
     private static final String CARD_SKILLDATA_FILENAME = "data/csv/skill_data.db";
     private static final String CARD_VCOMMENT_FILENAME = "data/csv/v_comment.db";
-    private static final String CARD_IMAGE_DIR = "images/card";
 
     private static final int CODE_BASE = 1;
     private static final int CODE_BASE_ID = 2;
-    private static final int CODE_IMAGE = 3;
     private static final int CODE_EVOLVE = 4;
     private static final int CODE_EVOLVE_ID = 5;
     private static final int CODE_COMMENTS = 6;
@@ -49,49 +33,17 @@ public class CardProvider extends ContentProvider {
     private static final int CODE_STAT_ID = 8;
     private static final UriMatcher uriMatcher = new UriMatcher(UriMatcher.NO_MATCH);
 
-    private static final String[] DEFAULT_OPENABLE_COLUMNS = new String[]{OpenableColumns.DISPLAY_NAME, OpenableColumns.SIZE};
-
     private File baseDir;
     private SQLiteOpenHelper helper;
 
     static {
         uriMatcher.addURI(AUTHORITY, "base", CODE_BASE);
         uriMatcher.addURI(AUTHORITY, "base/#", CODE_BASE_ID);
-        uriMatcher.addURI(AUTHORITY, "image/*/#", CODE_IMAGE);
         uriMatcher.addURI(AUTHORITY, "evolve", CODE_EVOLVE);
         uriMatcher.addURI(AUTHORITY, "evolve/#", CODE_EVOLVE_ID);
         uriMatcher.addURI(AUTHORITY, "comments", CODE_COMMENTS);
         uriMatcher.addURI(AUTHORITY, "comments/#", CODE_COMMENTS_ID);
         uriMatcher.addURI(AUTHORITY, "stat/#", CODE_STAT_ID);
-    }
-
-    private static String getCardImageType(Uri uri) {
-        List<String> segments = uri.getPathSegments();
-        return segments.get(segments.size() - 2);
-    }
-
-    private static String getCardImageId(Uri uri) {
-        return uri.getLastPathSegment();
-    }
-
-    private static String getCardImageExtension(Uri uri) {
-        return getCardImageType(uri).equals("xl") ? ".webp" : ".png";
-    }
-
-    private static byte[] readFully(File file) throws FileNotFoundException {
-        InputStream fin = new FileInputStream(file);
-        ByteArrayOutputStream out = new ByteArrayOutputStream();
-        byte[] buf = new byte[1024];
-        try {
-            while (true) {
-                int n = fin.read(buf);
-                if (n == -1) break;
-                out.write(buf, 0, n);
-            }
-        } catch (IOException ex) {
-            Log.e(TAG, "readFully(): reading failed", ex);
-        }
-        return out.toByteArray();
     }
 
     @Override
@@ -165,8 +117,8 @@ public class CardProvider extends ContentProvider {
                         "stat.max_final_defense AS max_defense, " +
                         "ROUND(CAST(stat.max_final_attack AS REAL) / CAST(card_data.cost AS REAL), 2) AS rate_attack, " +
                         "ROUND(CAST(stat.max_final_defense AS REAL) / CAST(card_data.cost AS REAL), 2) AS rate_defense, " +
-                        "'content://bupjae.android.cindemasutility.card/image/xs/' || card_data.card_id AS icon_uri, " +
-                        "'content://bupjae.android.cindemasutility.card/image/l/' || card_data.card_id AS image_uri, " +
+                        "'content://bupjae.android.cindemasutility.image/card/xs/' || card_data.card_id || '.png' AS icon_uri, " +
+                        "'content://bupjae.android.cindemasutility.image/card/l/' || card_data.card_id || '.png' AS image_uri, " +
                         "card_data.skill_name AS skill_name, " +
                         "REPLACE(card_data.skill_effect, '\\n', ' ') AS skill_effect, " +
                         "skill_data.default_skill_effect AS default_skill_effect " +
@@ -285,8 +237,6 @@ public class CardProvider extends ContentProvider {
                 return "vnd.android.cursor.dir/vnd.bupjae.android.cindemasutility.card.base";
             case CODE_BASE_ID:
                 return "vnd.android.cursor.item/vnd.bupjae.android.cindemasutility.card.base";
-            case CODE_IMAGE:
-                return getCardImageType(uri).equals("xl") ? "image/webp" : "image/png";
             case CODE_EVOLVE:
                 return "vnd.android.cursor.dir/vnd.bupjae.android.cindemasutility.card.evolve";
             case CODE_EVOLVE_ID:
@@ -316,30 +266,6 @@ public class CardProvider extends ContentProvider {
             // FALL_THROUGH
             case CODE_BASE: {
                 return helper.getReadableDatabase().query("base", projection, selection, selectionArgs, null, null, sortOrder);
-            }
-            case CODE_IMAGE: {
-                if (!selection.equals("1")) {
-                    Log.w(TAG, "Ignoring selection '" + selection + "' for image query");
-                }
-                String id = getCardImageId(uri);
-                Log.d(TAG, "image projection :: " + Arrays.toString(projection));
-                if (projection == null) {
-                    projection = DEFAULT_OPENABLE_COLUMNS;
-                }
-                Object[] values = new Object[projection.length];
-                for (int i = 0; i < projection.length; i++) {
-                    switch (projection[i]) {
-                        case OpenableColumns.DISPLAY_NAME:
-                            values[i] = String.format("%s_%s.%s", getCardImageType(uri), id, getCardImageExtension(uri));
-                            break;
-                        case OpenableColumns.SIZE:
-                            values[i] = getOriginalCardImageFile(uri).length();
-                            break;
-                    }
-                }
-                MatrixCursor cursor = new MatrixCursor(projection, 1);
-                cursor.addRow(values);
-                return cursor;
             }
             case CODE_EVOLVE_ID: {
                 selection = "(" + selection + ") AND card_id = ?";
@@ -386,65 +312,5 @@ public class CardProvider extends ContentProvider {
     public int update(Uri uri, ContentValues values, String selection, String[] selectionArgs) {
         Log.w(TAG, "Cannot update on read-only content provider");
         return 0;
-    }
-
-    @Override
-    public ParcelFileDescriptor openFile(Uri uri, String mode) throws FileNotFoundException {
-        if (!mode.equals("r")) {
-            throw new FileNotFoundException("Unsupported mode: " + mode);
-        }
-        switch (uriMatcher.match(uri)) {
-            case CODE_IMAGE:
-                File cacheFile = getCachedCardImageFile(uri);
-                if (!cacheFile.exists()) {
-                    File file = getOriginalCardImageFile(uri);
-                    byte[] buffer = readFully(file);
-                    byte mask;
-                    switch (getType(uri)) {
-                        case "image/png":
-                            mask = (byte) (buffer[0] ^ 137);
-                            break;
-                        case "image/webp":
-                            mask = (byte) (buffer[0] ^ 'R');
-                            break;
-                        default:
-                            mask = 0;
-                            break;
-                    }
-                    for (int i = 0; i < 50; i++) buffer[i] ^= mask;
-                    try {
-                        OutputStream os = new FileOutputStream(cacheFile);
-                        try {
-                            os.write(buffer);
-                        } finally {
-                            try {
-                                os.close();
-                            } catch (IOException ex) {
-                                Log.w(TAG, "openFile(): closing failed", ex);
-                            }
-                        }
-                    } catch (IOException ex) {
-                        Log.e(TAG, "openFile(): writing failed", ex);
-                        return null;
-                    }
-                }
-                return ParcelFileDescriptor.open(cacheFile, ParcelFileDescriptor.MODE_READ_ONLY);
-            default:
-                throw new FileNotFoundException(uri.toString());
-        }
-    }
-
-    private File getOriginalCardImageFile(Uri uri) {
-        List<String> segments = uri.getPathSegments();
-        String type = segments.get(segments.size() - 2);
-        String id = segments.get(segments.size() - 1);
-        return new File(new File(new File(baseDir, CARD_IMAGE_DIR), type), id + (type.equals("xl") ? ".webp" : ".png"));
-    }
-
-    private File getCachedCardImageFile(Uri uri) {
-        List<String> segments = uri.getPathSegments();
-        String type = segments.get(segments.size() - 2);
-        String id = segments.get(segments.size() - 1);
-        return new File(getContext().getCacheDir(), String.format("%s_%s.%s", type, id, (type.equals("xl") ? ".webp" : ".png")));
     }
 }
