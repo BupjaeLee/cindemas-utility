@@ -375,12 +375,29 @@ public class IdolProfileActivity extends Activity {
 
         @Override
         public Loader<Cursor> onCreateLoader(int id, Bundle args) {
+            String pn = producerName == null || producerName.isEmpty() ? "(프로듀서)" : producerName;
+            char trail = pn.charAt(pn.length() - 1);
+            String atA = "이/가", atB = "은/는", atC = "을/를", atD = "와/과";
+            if (0xac00 <= trail && trail <= 0xd7a3) {
+                if ((trail - 0xac00) % 28 == 0) {
+                    atA = "가";
+                    atB = "는";
+                    atC = "를";
+                    atD = "와";
+                } else {
+                    atA = "이";
+                    atB = "은";
+                    atC = "을";
+                    atD = "과";
+                }
+            }
+
             return new CursorLoader(
                     getActivity(),
                     Uri.parse("content://bupjae.android.cindemasutility.card/comments/" + cardId),
-                    new String[]{"kind_id AS _id", "comments_kind", "REPLACE(comments_value, '%s', ?) AS comments_value"},
+                    new String[]{"kind_id AS _id", "comments_kind", "REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(comments_value, '%s', ?), '@a', ?), '@b', ?), '@c', ?), '@d', ?) AS comments_value"},
                     showSecretComments ? null : "secret = 0",
-                    new String[]{producerName == null || producerName.isEmpty() ? "(프로듀서)" : producerName},
+                    new String[]{pn, atA, atB, atC, atD},
                     null);
         }
 
