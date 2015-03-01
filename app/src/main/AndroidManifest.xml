@@ -24,18 +24,13 @@
         <provider
             android:name=".CardProvider"
             android:authorities="bupjae.android.cindemasutility.card"
-            android:enabled="true"
-            android:exported="false"
-            android:grantUriPermissions="true" />
+            android:exported="false" />
 
         <provider
             android:name=".ImageProvider"
             android:authorities="bupjae.android.cindemasutility.image"
             android:exported="false"
             android:grantUriPermissions="true">
-            <meta-data
-                android:name="android.support.FILE_PROVIDER_PATHS"
-                android:resource="@xml/image_provider" />
         </provider>
     </application>
 </manifest>

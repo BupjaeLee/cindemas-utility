@@ -27,8 +27,13 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.CursorAdapter;
 import android.widget.SimpleCursorAdapter;
+import android.widget.Toast;
 
 import com.androidquery.AQuery;
+
+import java.util.EnumMap;
+import java.util.HashMap;
+import java.util.Map;
 
 public class IdolProfileActivity extends Activity {
     @SuppressWarnings("UnusedDeclaration")
@@ -105,8 +110,10 @@ public class IdolProfileActivity extends Activity {
                 arg.putLong(EXTRA_CARD_ID, cardId);
                 switch (position) {
                     case 0:
-                        return Fragment.instantiate(IdolProfileActivity.this, BasicProfileFragment.class.getName(), arg);
+                        return Fragment.instantiate(IdolProfileActivity.this, CardImageFragment.class.getName(), arg);
                     case 1:
+                        return Fragment.instantiate(IdolProfileActivity.this, BasicProfileFragment.class.getName(), arg);
+                    case 2:
                         return Fragment.instantiate(IdolProfileActivity.this, CommentFragment.class.getName(), arg);
                     default:
                         return null;
@@ -115,15 +122,17 @@ public class IdolProfileActivity extends Activity {
 
             @Override
             public int getCount() {
-                return 2;
+                return 3;
             }
 
             @Override
             public CharSequence getPageTitle(int position) {
                 switch (position) {
                     case 0:
-                        return "Basic";
+                        return "Image";
                     case 1:
+                        return "Basic";
+                    case 2:
                         return "Comments";
                     default:
                         return super.getPageTitle(position);
@@ -169,30 +178,23 @@ public class IdolProfileActivity extends Activity {
         return super.onOptionsItemSelected(item);
     }
 
-    public static class BasicProfileFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor> {
+    public abstract static class AbstractProfileFragment extends Fragment {
         private AQuery aq;
-
         private long cardId;
-        private int imageKind;
 
         private BroadcastReceiver receiver = new BroadcastReceiver() {
             @Override
             public void onReceive(Context context, Intent intent) {
                 cardId = intent.getLongExtra(EXTRA_CARD_ID, 0);
-                getLoaderManager().restartLoader(0, null, BasicProfileFragment.this);
+                onCardIdUpdated(cardId);
             }
         };
 
         @Nullable
         @Override
         public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-            View root = inflater.inflate(R.layout.fragment_idol_basic_profile, container, false);
+            View root = inflater.inflate(getLayoutId(), container, false);
             aq = new AQuery(root);
-            if (savedInstanceState != null) {
-                cardId = savedInstanceState.getLong(EXTRA_CARD_ID);
-            } else {
-                cardId = getArguments().getLong(EXTRA_CARD_ID);
-            }
             return root;
         }
 
@@ -200,64 +202,18 @@ public class IdolProfileActivity extends Activity {
         public void onActivityCreated(Bundle savedInstanceState) {
             super.onActivityCreated(savedInstanceState);
 
-            SharedPreferences preference = getActivity().getPreferences(MODE_PRIVATE);
-            imageKind = preference.getInt("image_kind", R.id.image_framed);
-
-            aq.id(R.id.image_framed).clicked(this, "onChangeImageKind");
-            aq.id(R.id.image_noframed).clicked(this, "onChangeImageKind");
-            aq.id(imageKind).checked(true);
-
-            getLoaderManager().restartLoader(0, null, this);
-        }
-
-        @SuppressWarnings("UnusedDeclaration")
-        public void onChangeImageKind(View view) {
-            imageKind = view.getId();
-            getActivity().getPreferences(MODE_PRIVATE).edit().putInt("image_kind", imageKind).apply();
-            getLoaderManager().restartLoader(0, null, this);
-        }
-
-        @Override
-        public Loader<Cursor> onCreateLoader(int id, Bundle args) {
-            return new CursorLoader(getActivity(), Uri.parse("content://bupjae.android.cindemasutility.card/base/" + cardId), null, null, null, null);
-        }
-
-        @Override
-        public void onLoadFinished(Loader<Cursor> loader, Cursor cursor) {
-            if (cursor.moveToFirst()) {
-                ContentValues cardData = new ContentValues();
-                DatabaseUtils.cursorRowToContentValues(cursor, cardData);
-                Uri imageUri = null;
-                switch (imageKind) {
-                    case R.id.image_framed:
-                        if (cardData.containsKey("image_uri"))
-                            imageUri = Uri.parse(cardData.getAsString("image_uri"));
-                        break;
-                    case R.id.image_noframed:
-                        if (cardData.containsKey("image_noframe_uri"))
-                            imageUri = Uri.parse(cardData.getAsString("image_noframe_uri"));
-                        break;
-                }
-                aq.id(R.id.info_card_image).getImageView().setImageURI(imageUri);
-                aq.id(R.id.info_rarity).text(cardData.getAsString("rarity"));
-                aq.id(R.id.info_cost).text(cardData.getAsString("cost"));
-                aq.id(R.id.info_maxlevel).text(cardData.getAsString("max_level"));
-                aq.id(R.id.info_max_attack).text(String.format("%d (%.2f)", cardData.getAsInteger("max_attack"), cardData.getAsDouble("rate_attack")));
-                aq.id(R.id.info_max_defense).text(String.format("%d (%.2f)", cardData.getAsInteger("max_defense"), cardData.getAsDouble("rate_defense")));
-
-                String skillName = cardData.getAsString("skill_name");
-                if (skillName == null || skillName.isEmpty()) {
-                    aq.id(R.id.info_skill_name).text("없음");
-                    aq.id(R.id.info_skill_row).invisible();
-                } else {
-                    aq.id(R.id.info_skill_name).text(skillName);
-                    aq.id(R.id.info_skill_effect).text(
-                            String.format("%s (%d%%~)",
-                                    cardData.getAsString("skill_effect"),
-                                    cardData.getAsInteger("default_skill_effect")));
-                    aq.id(R.id.info_skill_row).visible();
-                }
+            if (savedInstanceState != null) {
+                cardId = savedInstanceState.getLong(EXTRA_CARD_ID);
+            } else {
+                cardId = getArguments().getLong(EXTRA_CARD_ID);
             }
+            onCardIdUpdated(cardId);
+        }
+
+        @Override
+        public void onSaveInstanceState(Bundle outState) {
+            super.onSaveInstanceState(outState);
+            outState.putLong(EXTRA_CARD_ID, cardId);
         }
 
         @Override
@@ -274,10 +230,150 @@ public class IdolProfileActivity extends Activity {
             LocalBroadcastManager.getInstance(getActivity()).unregisterReceiver(receiver);
         }
 
+        protected final AQuery aq(int id) {
+            return aq.id(id);
+        }
+
+        protected final long cardId() {
+            return cardId;
+        }
+
+        protected abstract int getLayoutId();
+
+        protected abstract void onCardIdUpdated(long cardId);
+    }
+
+    public static class CardImageFragment extends AbstractProfileFragment {
+        private ImageType currentType;
+        private Map<ImageType, Uri> uriMap;
+
         @Override
-        public void onSaveInstanceState(Bundle outState) {
-            super.onSaveInstanceState(outState);
-            outState.putLong(EXTRA_CARD_ID, cardId);
+        public void onActivityCreated(Bundle savedInstanceState) {
+            super.onActivityCreated(savedInstanceState);
+            aq(R.id.image_framed).clicked(this, "onChangeImageType");
+            aq(R.id.image_noframed).clicked(this, "onChangeImageType");
+            aq(R.id.image_export).clicked(this, "onImageExport");
+        }
+
+        @Override
+        protected int getLayoutId() {
+            return R.layout.fragment_idol_card_image;
+        }
+
+        @Override
+        protected void onCardIdUpdated(long cardId) {
+            if (uriMap == null) uriMap = new EnumMap<>(ImageType.class);
+            uriMap.put(ImageType.FRAMED_CARD_IMAGE, Uri.parse("content://bupjae.android.cindemasutility.image/card/l/" + cardId + ".png"));
+            uriMap.put(ImageType.NOFRAMED_CARD_IMAGE, Uri.parse("content://bupjae.android.cindemasutility.image/card/xl/" + cardId + ".webp"));
+            updateImage();
+        }
+
+        @SuppressWarnings("UnusedDeclaration")
+        public void onChangeImageType(View view) {
+            currentType = ImageType.fromWidgetId(view.getId());
+            updateImage();
+        }
+
+        @SuppressWarnings("UnusedDeclaration")
+        public void onImageExport(View view) {
+            Uri source = uriMap.get(currentType);
+            if (source == null) {
+                return;
+            }
+            Bundle result = getActivity().getContentResolver().call(Uri.parse("content://" + ImageProvider.AUTHORITY), "export", source.toString(), null);
+            if (result == null) {
+                Toast.makeText(getActivity(), "Export error", Toast.LENGTH_SHORT).show();
+                return;
+            }
+            Intent intent = new Intent(Intent.ACTION_VIEW);
+            intent.setDataAndType(result.<Uri>getParcelable(ImageProvider.EXTRA_EXPORTED_URI), result.getString(ImageProvider.EXTRA_EXPORTED_TYPE));
+            intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+            getActivity().startActivity(intent);
+        }
+
+        private void updateImage() {
+            SharedPreferences preference = getActivity().getPreferences(MODE_PRIVATE);
+            if (currentType == null) {
+                try {
+                    currentType = ImageType.valueOf(preference.getString("image_type", ImageType.FRAMED_CARD_IMAGE.toString()));
+                } catch (IllegalArgumentException ex) {
+                    currentType = ImageType.FRAMED_CARD_IMAGE;
+                }
+            }
+            preference.edit().putString("image_type", currentType.toString()).apply();
+            aq(currentType.getWidgetId()).checked(true);
+            aq(R.id.info_card_image).getImageView().setImageURI(uriMap.get(currentType));
+        }
+
+        public enum ImageType {
+            FRAMED_CARD_IMAGE(R.id.image_framed),
+            NOFRAMED_CARD_IMAGE(R.id.image_noframed);
+
+            private static final Map<Integer, ImageType> fromWidgetIdMap = new HashMap<>();
+
+            private final int widgetId;
+
+            private ImageType(int widgetId) {
+                this.widgetId = widgetId;
+            }
+
+            public int getWidgetId() {
+                return widgetId;
+            }
+
+            public static ImageType fromWidgetId(int widgetId) {
+                return fromWidgetIdMap.get(widgetId);
+            }
+
+            static {
+                for (ImageType type : values()) {
+                    fromWidgetIdMap.put(type.widgetId, type);
+                }
+            }
+        }
+    }
+
+    public static class BasicProfileFragment extends AbstractProfileFragment implements LoaderManager.LoaderCallbacks<Cursor> {
+
+        @Override
+        protected int getLayoutId() {
+            return R.layout.fragment_idol_basic_profile;
+        }
+
+        @Override
+        protected void onCardIdUpdated(long cardId) {
+            getLoaderManager().restartLoader(0, null, this);
+        }
+
+        @Override
+        public Loader<Cursor> onCreateLoader(int id, Bundle args) {
+            return new CursorLoader(getActivity(), Uri.parse("content://bupjae.android.cindemasutility.card/base/" + cardId()), null, null, null, null);
+        }
+
+        @Override
+        public void onLoadFinished(Loader<Cursor> loader, Cursor cursor) {
+            if (cursor.moveToFirst()) {
+                ContentValues cardData = new ContentValues();
+                DatabaseUtils.cursorRowToContentValues(cursor, cardData);
+                aq(R.id.info_rarity).text(cardData.getAsString("rarity"));
+                aq(R.id.info_cost).text(cardData.getAsString("cost"));
+                aq(R.id.info_maxlevel).text(cardData.getAsString("max_level"));
+                aq(R.id.info_max_attack).text(String.format("%d (%.2f)", cardData.getAsInteger("max_attack"), cardData.getAsDouble("rate_attack")));
+                aq(R.id.info_max_defense).text(String.format("%d (%.2f)", cardData.getAsInteger("max_defense"), cardData.getAsDouble("rate_defense")));
+
+                String skillName = cardData.getAsString("skill_name");
+                if (skillName == null || skillName.isEmpty()) {
+                    aq(R.id.info_skill_name).text("없음");
+                    aq(R.id.info_skill_row).invisible();
+                } else {
+                    aq(R.id.info_skill_name).text(skillName);
+                    aq(R.id.info_skill_effect).text(
+                            String.format("%s (%d%%~)",
+                                    cardData.getAsString("skill_effect"),
+                                    cardData.getAsInteger("default_skill_effect")));
+                    aq(R.id.info_skill_row).visible();
+                }
+            }
         }
 
         @Override
@@ -285,34 +381,20 @@ public class IdolProfileActivity extends Activity {
         }
     }
 
-    public static class CommentFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor> {
-
-        private AQuery aq;
+    public static class CommentFragment extends AbstractProfileFragment implements LoaderManager.LoaderCallbacks<Cursor> {
         private CursorAdapter commentsAdaptor;
 
-        private long cardId;
         private boolean showSecretComments;
         private String producerName;
 
-        private BroadcastReceiver receiver = new BroadcastReceiver() {
-            @Override
-            public void onReceive(Context context, Intent intent) {
-                cardId = intent.getLongExtra(EXTRA_CARD_ID, 0);
-                getLoaderManager().restartLoader(0, null, CommentFragment.this);
-            }
-        };
-
-        @Nullable
         @Override
-        public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-            View root = inflater.inflate(R.layout.fragment_idol_comments, container, false);
-            aq = new AQuery(root);
-            if (savedInstanceState != null) {
-                cardId = savedInstanceState.getLong(EXTRA_CARD_ID);
-            } else {
-                cardId = getArguments().getLong(EXTRA_CARD_ID);
-            }
-            return root;
+        protected int getLayoutId() {
+            return R.layout.fragment_idol_comments;
+        }
+
+        @Override
+        protected void onCardIdUpdated(long cardId) {
+            getLoaderManager().restartLoader(0, null, this);
         }
 
         @Override
@@ -328,47 +410,27 @@ public class IdolProfileActivity extends Activity {
                     new String[]{"comments_value", "comments_kind"},
                     new int[]{android.R.id.text1, android.R.id.text2},
                     0);
-            aq.id(R.id.comment_list).adapter(commentsAdaptor);
-            aq.id(R.id.producer_name)
+            aq(R.id.comment_list).adapter(commentsAdaptor);
+            aq(R.id.producer_name)
                     .text(producerName = preference.getString("producer_name", ""))
                     .textChanged(this, "onProducerNameChanged");
-            aq.id(R.id.show_secret_comments)
+            aq(R.id.show_secret_comments)
                     .checked(showSecretComments = preference.getBoolean("show_secret_comments", false))
                     .clicked(this, "onShowSecretClicked");
 
             getLoaderManager().restartLoader(0, null, this);
         }
 
-        @Override
-        public void onStart() {
-            super.onStart();
-            IntentFilter filter = new IntentFilter();
-            filter.addAction(ACTION_CARD_ID_CHANGED);
-            LocalBroadcastManager.getInstance(getActivity()).registerReceiver(receiver, filter);
-        }
-
-        @Override
-        public void onStop() {
-            super.onStop();
-            LocalBroadcastManager.getInstance(getActivity()).unregisterReceiver(receiver);
-        }
-
-        @Override
-        public void onSaveInstanceState(Bundle outState) {
-            super.onSaveInstanceState(outState);
-            outState.putLong(EXTRA_CARD_ID, cardId);
-        }
-
         @SuppressWarnings("UnusedDeclaration")
         public void onShowSecretClicked(View view) {
-            showSecretComments = aq.id(R.id.show_secret_comments).isChecked();
+            showSecretComments = aq(R.id.show_secret_comments).isChecked();
             getActivity().getPreferences(MODE_PRIVATE).edit().putBoolean("show_secret_comments", showSecretComments).apply();
             getLoaderManager().restartLoader(0, null, this);
         }
 
         @SuppressWarnings("UnusedDeclaration")
         public void onProducerNameChanged(CharSequence s, int start, int before, int count) {
-            producerName = aq.id(R.id.producer_name).getText().toString();
+            producerName = aq(R.id.producer_name).getText().toString();
             getActivity().getPreferences(MODE_PRIVATE).edit().putString("producer_name", producerName).apply();
             getLoaderManager().restartLoader(0, null, this);
         }
@@ -394,7 +456,7 @@ public class IdolProfileActivity extends Activity {
 
             return new CursorLoader(
                     getActivity(),
-                    Uri.parse("content://bupjae.android.cindemasutility.card/comments/" + cardId),
+                    Uri.parse("content://bupjae.android.cindemasutility.card/comments/" + cardId()),
                     new String[]{"kind_id AS _id", "comments_kind", "REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(comments_value, '%s', ?), '@a', ?), '@b', ?), '@c', ?), '@d', ?) AS comments_value"},
                     showSecretComments ? null : "secret = 0",
                     new String[]{pn, atA, atB, atC, atD},
