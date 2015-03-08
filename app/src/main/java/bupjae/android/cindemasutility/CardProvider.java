@@ -5,6 +5,7 @@ import android.content.ContentValues;
 import android.content.UriMatcher;
 import android.database.Cursor;
 import android.database.DatabaseUtils;
+import android.database.MatrixCursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.net.Uri;
@@ -31,6 +32,7 @@ public class CardProvider extends ContentProvider {
     private static final int CODE_COMMENTS = 6;
     private static final int CODE_COMMENTS_ID = 7;
     private static final int CODE_STAT_ID = 8;
+    private static final int CODE_IMAGEURI_ID = 9;
     private static final UriMatcher uriMatcher = new UriMatcher(UriMatcher.NO_MATCH);
 
     private File baseDir;
@@ -44,6 +46,7 @@ public class CardProvider extends ContentProvider {
         uriMatcher.addURI(AUTHORITY, "comments", CODE_COMMENTS);
         uriMatcher.addURI(AUTHORITY, "comments/#", CODE_COMMENTS_ID);
         uriMatcher.addURI(AUTHORITY, "stat/#", CODE_STAT_ID);
+        uriMatcher.addURI(AUTHORITY, "imageuri/#", CODE_IMAGEURI_ID);
     }
 
     @Override
@@ -248,6 +251,8 @@ public class CardProvider extends ContentProvider {
                 return "vnd.android.cursor.item/vnd.bupjae.android.cindemasutility.card.comments";
             case CODE_STAT_ID:
                 return "vnd.android.cursor.item/vnd.bupjae.android.cindemasutility.card.stat";
+            case CODE_IMAGEURI_ID:
+                return "vnd.android.cursor.item/vnd.bupjae.android.cindemasutility.card.imageuri";
             default:
                 return null;
         }
@@ -286,11 +291,22 @@ public class CardProvider extends ContentProvider {
             }
             case CODE_STAT_ID: {
                 if (!selection.equals("1")) {
-                    Log.w(TAG, "Ignoring selection '" + selection + "' for single row query");
+                    Log.w(TAG, "Ignoring selection '" + selection + "' for STAT_ID");
                 }
                 selection = "card_id = ?";
                 selectionArgs = new String[]{uri.getLastPathSegment()};
                 return helper.getReadableDatabase().query("stat", projection, selection, selectionArgs, null, null, sortOrder);
+            }
+            case CODE_IMAGEURI_ID: {
+                if(!selection.equals("1")) {
+                    Log.w(TAG, "Ignoring selection '"+selection+"' for IMAGEURI_ID");
+                }
+                MatrixCursor ret = new MatrixCursor(new String[]{"FRAMED_CARD_IMAGE", "NOFRAMED_CARD_IMAGE"}, 1);
+                ret.addRow(new String[]{
+                        "content://bupjae.android.cindemasutility.image/card/l/" + uri.getLastPathSegment() + ".png",
+                        "content://bupjae.android.cindemasutility.image/card/xl/" + uri.getLastPathSegment() + ".webp",
+                });
+                return ret;
             }
             default:
                 throw new IllegalArgumentException("Unknown URI : " + uri);

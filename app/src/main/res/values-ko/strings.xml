@@ -23,4 +23,7 @@
     <string name="sortby_defrate">방/코</string>
     <string name="image_framed">프레임 있음</string>
     <string name="image_noframed">프레임 없음</string>
+    <string name="description_card_image">카드 이미지</string>
+    <string name="info_max_attack">MATK:</string>
+    <string name="info_max_defense">MDEF:</string>
 </resources>

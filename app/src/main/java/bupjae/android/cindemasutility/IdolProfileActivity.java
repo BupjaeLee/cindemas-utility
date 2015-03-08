@@ -31,13 +31,13 @@ import android.widget.Toast;
 
 import com.androidquery.AQuery;
 
-import java.util.EnumMap;
 import java.util.HashMap;
 import java.util.Map;
 
 public class IdolProfileActivity extends Activity {
     @SuppressWarnings("UnusedDeclaration")
     private static final String TAG = IdolProfileActivity.class.getSimpleName();
+    public static final String ACTION_REQUEST_CARD_ID = "bupjae.android.cindemasutility.action.REQUEST_CARD_ID";
     public static final String ACTION_CARD_ID_CHANGED = "bupjae.android.cindemasutility.action.CARD_ID_CHANGED";
     public static final String EXTRA_CARD_ID = IdolSelectActivity.EXTRA_CARD_ID;
 
@@ -84,6 +84,15 @@ public class IdolProfileActivity extends Activity {
         }
     };
 
+    private BroadcastReceiver receiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent i) {
+            Intent intent = new Intent(ACTION_CARD_ID_CHANGED);
+            intent.putExtra(EXTRA_CARD_ID, cardId);
+            LocalBroadcastManager.getInstance(IdolProfileActivity.this).sendBroadcast(intent);
+        }
+    };
+
     private void changeCard(long cardId) {
         if (cardId == 0) return;
         this.cardId = cardId;
@@ -107,7 +116,6 @@ public class IdolProfileActivity extends Activity {
             @Override
             public Fragment getItem(int position) {
                 Bundle arg = new Bundle();
-                arg.putLong(EXTRA_CARD_ID, cardId);
                 switch (position) {
                     case 0:
                         return Fragment.instantiate(IdolProfileActivity.this, CardImageFragment.class.getName(), arg);
@@ -141,6 +149,20 @@ public class IdolProfileActivity extends Activity {
         });
 
         changeCard(getIntent().getLongExtra(EXTRA_CARD_ID, 0));
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+        IntentFilter filter = new IntentFilter();
+        filter.addAction(ACTION_REQUEST_CARD_ID);
+        LocalBroadcastManager.getInstance(this).registerReceiver(receiver, filter);
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+        LocalBroadcastManager.getInstance(this).unregisterReceiver(receiver);
     }
 
     @Override
@@ -178,15 +200,18 @@ public class IdolProfileActivity extends Activity {
         return super.onOptionsItemSelected(item);
     }
 
-    public abstract static class AbstractProfileFragment extends Fragment {
+    public abstract static class AbstractProfileFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor> {
         private AQuery aq;
         private long cardId;
 
         private BroadcastReceiver receiver = new BroadcastReceiver() {
             @Override
             public void onReceive(Context context, Intent intent) {
-                cardId = intent.getLongExtra(EXTRA_CARD_ID, 0);
-                onCardIdUpdated(cardId);
+                long curCardId = intent.getLongExtra(EXTRA_CARD_ID, 0);
+                if (cardId != curCardId) {
+                    cardId = curCardId;
+                    getLoaderManager().restartLoader(0, null, AbstractProfileFragment.this);
+                }
             }
         };
 
@@ -199,29 +224,14 @@ public class IdolProfileActivity extends Activity {
         }
 
         @Override
-        public void onActivityCreated(Bundle savedInstanceState) {
-            super.onActivityCreated(savedInstanceState);
-
-            if (savedInstanceState != null) {
-                cardId = savedInstanceState.getLong(EXTRA_CARD_ID);
-            } else {
-                cardId = getArguments().getLong(EXTRA_CARD_ID);
-            }
-            onCardIdUpdated(cardId);
-        }
-
-        @Override
-        public void onSaveInstanceState(Bundle outState) {
-            super.onSaveInstanceState(outState);
-            outState.putLong(EXTRA_CARD_ID, cardId);
-        }
-
-        @Override
         public void onStart() {
             super.onStart();
             IntentFilter filter = new IntentFilter();
             filter.addAction(ACTION_CARD_ID_CHANGED);
             LocalBroadcastManager.getInstance(getActivity()).registerReceiver(receiver, filter);
+
+            Intent intent = new Intent(ACTION_REQUEST_CARD_ID);
+            LocalBroadcastManager.getInstance(getActivity()).sendBroadcast(intent);
         }
 
         @Override
@@ -239,13 +249,11 @@ public class IdolProfileActivity extends Activity {
         }
 
         protected abstract int getLayoutId();
-
-        protected abstract void onCardIdUpdated(long cardId);
     }
 
     public static class CardImageFragment extends AbstractProfileFragment {
         private ImageType currentType;
-        private Map<ImageType, Uri> uriMap;
+        private ContentValues uriData;
 
         @Override
         public void onActivityCreated(Bundle savedInstanceState) {
@@ -260,14 +268,6 @@ public class IdolProfileActivity extends Activity {
             return R.layout.fragment_idol_card_image;
         }
 
-        @Override
-        protected void onCardIdUpdated(long cardId) {
-            if (uriMap == null) uriMap = new EnumMap<>(ImageType.class);
-            uriMap.put(ImageType.FRAMED_CARD_IMAGE, Uri.parse("content://bupjae.android.cindemasutility.image/card/l/" + cardId + ".png"));
-            uriMap.put(ImageType.NOFRAMED_CARD_IMAGE, Uri.parse("content://bupjae.android.cindemasutility.image/card/xl/" + cardId + ".webp"));
-            updateImage();
-        }
-
         @SuppressWarnings("UnusedDeclaration")
         public void onChangeImageType(View view) {
             currentType = ImageType.fromWidgetId(view.getId());
@@ -276,10 +276,10 @@ public class IdolProfileActivity extends Activity {
 
         @SuppressWarnings("UnusedDeclaration")
         public void onImageExport(View view) {
-            Uri source = uriMap.get(currentType);
-            if (source == null) {
-                return;
-            }
+            if (uriData == null) return;
+            String uriString = uriData.getAsString(currentType.toString());
+            if (uriString == null) return;
+            Uri source = Uri.parse(uriString);
             Bundle result = getActivity().getContentResolver().call(Uri.parse("content://" + ImageProvider.AUTHORITY), "export", source.toString(), null);
             if (result == null) {
                 Toast.makeText(getActivity(), "Export error", Toast.LENGTH_SHORT).show();
@@ -302,7 +302,29 @@ public class IdolProfileActivity extends Activity {
             }
             preference.edit().putString("image_type", currentType.toString()).apply();
             aq(currentType.getWidgetId()).checked(true);
-            aq(R.id.info_card_image).getImageView().setImageURI(uriMap.get(currentType));
+            if (uriData == null) return;
+            String uriString = uriData.getAsString(currentType.toString());
+            if (uriString == null) return;
+            aq(R.id.info_card_image).getImageView().setImageURI(Uri.parse(uriString));
+        }
+
+        @Override
+        public Loader<Cursor> onCreateLoader(int id, Bundle args) {
+            return new CursorLoader(getActivity(), Uri.parse("content://bupjae.android.cindemasutility.card/imageuri/" + cardId()), null, null, null, null);
+        }
+
+        @Override
+        public void onLoadFinished(Loader<Cursor> loader, Cursor cursor) {
+
+            if (cursor.moveToFirst()) {
+                uriData=new ContentValues();
+                DatabaseUtils.cursorRowToContentValues(cursor, uriData);
+                updateImage();
+            }
+        }
+
+        @Override
+        public void onLoaderReset(Loader<Cursor> loader) {
         }
 
         public enum ImageType {
@@ -333,16 +355,11 @@ public class IdolProfileActivity extends Activity {
         }
     }
 
-    public static class BasicProfileFragment extends AbstractProfileFragment implements LoaderManager.LoaderCallbacks<Cursor> {
+    public static class BasicProfileFragment extends AbstractProfileFragment {
 
         @Override
         protected int getLayoutId() {
             return R.layout.fragment_idol_basic_profile;
-        }
-
-        @Override
-        protected void onCardIdUpdated(long cardId) {
-            getLoaderManager().restartLoader(0, null, this);
         }
 
         @Override
@@ -381,7 +398,7 @@ public class IdolProfileActivity extends Activity {
         }
     }
 
-    public static class CommentFragment extends AbstractProfileFragment implements LoaderManager.LoaderCallbacks<Cursor> {
+    public static class CommentFragment extends AbstractProfileFragment {
         private CursorAdapter commentsAdaptor;
 
         private boolean showSecretComments;
@@ -390,11 +407,6 @@ public class IdolProfileActivity extends Activity {
         @Override
         protected int getLayoutId() {
             return R.layout.fragment_idol_comments;
-        }
-
-        @Override
-        protected void onCardIdUpdated(long cardId) {
-            getLoaderManager().restartLoader(0, null, this);
         }
 
         @Override
