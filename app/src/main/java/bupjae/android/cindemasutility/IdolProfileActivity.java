@@ -21,8 +21,6 @@ import android.support.v13.app.FragmentPagerAdapter;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v4.view.PagerAdapter;
 import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.CursorAdapter;
@@ -41,7 +39,7 @@ public class IdolProfileActivity extends Activity {
     public static final String ACTION_CARD_ID_CHANGED = "bupjae.android.cindemasutility.action.CARD_ID_CHANGED";
     public static final String EXTRA_CARD_ID = IdolSelectActivity.EXTRA_CARD_ID;
 
-    private Menu menu;
+    private AQuery aq;
 
     private long cardId;
     private long evolveFrom;
@@ -71,9 +69,12 @@ public class IdolProfileActivity extends Activity {
                     break;
                 case 1:
                     if (cursor.moveToFirst()) {
-                        evolveFrom = cursor.getLong(cursor.getColumnIndexOrThrow("evo_before_id"));
-                        evolveTo = cursor.getLong(cursor.getColumnIndexOrThrow("evo_after_id"));
-                        onPrepareOptionsMenu(menu);
+                        ContentValues evolveData = new ContentValues();
+                        DatabaseUtils.cursorRowToContentValues(cursor, evolveData);
+                        evolveFrom = evolveData.getAsLong("evo_before_id");
+                        evolveTo = evolveData.getAsLong("evo_after_id");
+                        aq.id(R.id.before_evolve).visibility(evolveFrom == 0 ? View.INVISIBLE : View.VISIBLE);
+                        aq.id(R.id.after_evolve).visibility(evolveTo == 0 ? View.INVISIBLE : View.VISIBLE);
                     }
                     break;
             }
@@ -110,7 +111,21 @@ public class IdolProfileActivity extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_idol_profile);
-        AQuery aq = new AQuery(this);
+        aq = new AQuery(this);
+
+        aq.id(R.id.before_evolve).clicked(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (evolveFrom != 0)
+                    changeCard(evolveFrom);
+            }
+        });
+        aq.id(R.id.after_evolve).clicked(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (evolveTo != 0) changeCard(evolveTo);
+            }
+        });
 
         aq.id(R.id.info_tabs).invoke("setAdapter", new Class<?>[]{PagerAdapter.class}, new FragmentPagerAdapter(getFragmentManager()) {
             @Override
@@ -163,41 +178,6 @@ public class IdolProfileActivity extends Activity {
     public void onStop() {
         super.onStop();
         LocalBroadcastManager.getInstance(this).unregisterReceiver(receiver);
-    }
-
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.menu_idol_profile, menu);
-        this.menu = menu;
-        return true;
-    }
-
-    @Override
-    public boolean onPrepareOptionsMenu(Menu menu) {
-        super.onPrepareOptionsMenu(menu);
-        if (menu == null) return true;
-        menu.findItem(R.id.action_before_evolve)
-                .setEnabled(evolveFrom != 0)
-                .getIcon().setAlpha(evolveFrom != 0 ? 255 : 64);
-        menu.findItem(R.id.action_after_evolve)
-                .setEnabled(evolveTo != 0)
-                .getIcon().setAlpha(evolveTo != 0 ? 255 : 64);
-        return true;
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        int id = item.getItemId();
-        if (id == R.id.action_before_evolve) {
-            changeCard(evolveFrom);
-            return true;
-        }
-        if (id == R.id.action_after_evolve) {
-            changeCard(evolveTo);
-            return true;
-        }
-        return super.onOptionsItemSelected(item);
     }
 
     public abstract static class AbstractProfileFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor> {
@@ -317,7 +297,7 @@ public class IdolProfileActivity extends Activity {
         public void onLoadFinished(Loader<Cursor> loader, Cursor cursor) {
 
             if (cursor.moveToFirst()) {
-                uriData=new ContentValues();
+                uriData = new ContentValues();
                 DatabaseUtils.cursorRowToContentValues(cursor, uriData);
                 updateImage();
             }

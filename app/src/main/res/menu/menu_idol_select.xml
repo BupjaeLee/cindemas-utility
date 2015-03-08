@@ -9,8 +9,8 @@
         android:title="@string/search_title" />
     <item
         android:icon="@android:drawable/ic_menu_sort_alphabetically"
-        android:showAsAction="ifRoom"
-        android:title="Sort">
+        android:showAsAction="always"
+        android:title="@string/sortby">
         <menu>
             <group
                 android:id="@+id/sortby"

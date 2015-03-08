@@ -18,8 +18,7 @@
         </activity>
         <activity
             android:name=".IdolProfileActivity"
-            android:label="@string/title_activity_profile"
-            android:uiOptions="splitActionBarWhenNarrow" />
+            android:label="@string/title_activity_profile" />
 
         <provider
             android:name=".CardProvider"
@@ -30,7 +29,6 @@
             android:name=".ImageProvider"
             android:authorities="bupjae.android.cindemasutility.image"
             android:exported="false"
-            android:grantUriPermissions="true">
-        </provider>
+            android:grantUriPermissions="true" />
     </application>
 </manifest>

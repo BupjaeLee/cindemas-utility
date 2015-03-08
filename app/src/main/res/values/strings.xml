@@ -7,8 +7,8 @@
     <string name="info_rarity">Rarity:</string>
     <string name="info_cost">Cost:</string>
     <string name="info_maxlevel">Max level:</string>
-    <string name="before_awake">Before awake</string>
-    <string name="after_awake">After awake</string>
+    <string name="before_evolve">Before evolve</string>
+    <string name="after_evolve">After evolve</string>
     <string name="info_icon">idol icon</string>
     <string name="waiting_message">Preparing database\nPlease wait</string>
     <string name="info_max_attack">MATK:</string>
@@ -19,6 +19,7 @@
     <string name="info_skill">Skill:</string>
     <string name="info_effect">Effect:</string>
     <string name="producer_name">Producer name</string>
+    <string name="sortby">Sort</string>
     <string name="sortby_database">No sort</string>
     <string name="sortby_atk">By ATK</string>
     <string name="sortby_def">By DEF</string>

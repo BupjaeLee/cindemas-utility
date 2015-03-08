@@ -21,4 +21,31 @@
             android:layout_gravity="top" />
 
     </android.support.v4.view.ViewPager>
+
+    <LinearLayout
+        style="?android:attr/buttonBarStyle"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <Button
+            android:id="@+id/before_evolve"
+            style="?android:attr/buttonBarButtonStyle"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:drawableLeft="@android:drawable/ic_media_rew"
+            android:drawableStart="@android:drawable/ic_media_rew"
+            android:text="@string/before_evolve" />
+
+        <Button
+            android:id="@+id/after_evolve"
+            style="?android:attr/buttonBarButtonStyle"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:drawableEnd="@android:drawable/ic_media_ff"
+            android:drawableRight="@android:drawable/ic_media_ff"
+            android:text="@string/after_evolve" />
+    </LinearLayout>
 </LinearLayout>

@@ -132,11 +132,14 @@ public class CardProvider extends ContentProvider {
                 db.execSQL("CREATE TEMP VIEW evolve AS SELECT " +
                         "c1.card_id AS card_id, " +
                         "c1.evo_card_id AS evo_after_id, " +
+                        "IFNULL(d1.card_name, '') AS evo_after_name, " +
                         "IFNULL(c2.card_id, 0) AS evo_before_id, " +
+                        "IFNULL(d2.card_name, '') AS evo_before_name, " +
                         "IFNULL(c2.material_card, 0) AS material_id " +
                         "FROM composition AS c1 " +
                         "LEFT JOIN composition AS c2 ON c1.card_id = c2.evo_card_id " +
-                        "LEFT JOIN composition AS c3 ON c1.evo_card_id = c3.card_id");
+                        "LEFT JOIN card_data AS d1 ON c1.evo_card_id = d1.card_id " +
+                        "LEFT JOIN card_data AS d2 ON c2.card_id = d2.card_id");
                 db.execSQL("CREATE TEMP VIEW comments AS " +
                         "      SELECT card_id, 0 AS kind_id, 'profile' AS comments_kind, comment AS comments_value, 0 AS secret FROM card_data " +
                         "UNION SELECT card_id, 1 AS kind_id, 'my_1' AS comments_kind, comments_my_1 AS comments_value, 0 AS secret FROM card_comments " +
@@ -298,8 +301,8 @@ public class CardProvider extends ContentProvider {
                 return helper.getReadableDatabase().query("stat", projection, selection, selectionArgs, null, null, sortOrder);
             }
             case CODE_IMAGEURI_ID: {
-                if(!selection.equals("1")) {
-                    Log.w(TAG, "Ignoring selection '"+selection+"' for IMAGEURI_ID");
+                if (!selection.equals("1")) {
+                    Log.w(TAG, "Ignoring selection '" + selection + "' for IMAGEURI_ID");
                 }
                 MatrixCursor ret = new MatrixCursor(new String[]{"FRAMED_CARD_IMAGE", "NOFRAMED_CARD_IMAGE"}, 1);
                 ret.addRow(new String[]{
