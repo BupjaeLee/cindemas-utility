@@ -21,11 +21,13 @@ import android.support.v13.app.FragmentPagerAdapter;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v4.view.PagerAdapter;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.CursorAdapter;
+import android.widget.ShareActionProvider;
 import android.widget.SimpleCursorAdapter;
-import android.widget.Toast;
 
 import com.androidquery.AQuery;
 
@@ -234,13 +236,14 @@ public class IdolProfileActivity extends Activity {
     public static class CardImageFragment extends AbstractProfileFragment {
         private ImageType currentType;
         private ContentValues uriData;
+        private ShareActionProvider shareActionProvider;
 
         @Override
         public void onActivityCreated(Bundle savedInstanceState) {
             super.onActivityCreated(savedInstanceState);
+            setHasOptionsMenu(true);
             aq(R.id.image_framed).clicked(this, "onChangeImageType");
             aq(R.id.image_noframed).clicked(this, "onChangeImageType");
-            aq(R.id.image_export).clicked(this, "onImageExport");
         }
 
         @Override
@@ -248,27 +251,17 @@ public class IdolProfileActivity extends Activity {
             return R.layout.fragment_idol_card_image;
         }
 
+        @Override
+        public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+            super.onCreateOptionsMenu(menu, inflater);
+            inflater.inflate(R.menu.menu_card_image, menu);
+            shareActionProvider = (ShareActionProvider) menu.findItem(R.id.share).getActionProvider();
+        }
+
         @SuppressWarnings("UnusedDeclaration")
         public void onChangeImageType(View view) {
             currentType = ImageType.fromWidgetId(view.getId());
             updateImage();
-        }
-
-        @SuppressWarnings("UnusedDeclaration")
-        public void onImageExport(View view) {
-            if (uriData == null) return;
-            String uriString = uriData.getAsString(currentType.toString());
-            if (uriString == null) return;
-            Uri source = Uri.parse(uriString);
-            Bundle result = getActivity().getContentResolver().call(Uri.parse("content://" + ImageProvider.AUTHORITY), "export", source.toString(), null);
-            if (result == null) {
-                Toast.makeText(getActivity(), "Export error", Toast.LENGTH_SHORT).show();
-                return;
-            }
-            Intent intent = new Intent(Intent.ACTION_VIEW);
-            intent.setDataAndType(result.<Uri>getParcelable(ImageProvider.EXTRA_EXPORTED_URI), result.getString(ImageProvider.EXTRA_EXPORTED_TYPE));
-            intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-            getActivity().startActivity(intent);
         }
 
         private void updateImage() {
@@ -286,6 +279,12 @@ public class IdolProfileActivity extends Activity {
             String uriString = uriData.getAsString(currentType.toString());
             if (uriString == null) return;
             aq(R.id.info_card_image).getImageView().setImageURI(Uri.parse(uriString));
+
+            Intent shareIntent = new Intent();
+            shareIntent.setAction(Intent.ACTION_SEND);
+            shareIntent.putExtra(Intent.EXTRA_STREAM, Uri.parse(uriString));
+            shareIntent.setType(getActivity().getContentResolver().getType(Uri.parse(uriString)));
+            shareActionProvider.setShareIntent(shareIntent);
         }
 
         @Override
@@ -295,7 +294,6 @@ public class IdolProfileActivity extends Activity {
 
         @Override
         public void onLoadFinished(Loader<Cursor> loader, Cursor cursor) {
-
             if (cursor.moveToFirst()) {
                 uriData = new ContentValues();
                 DatabaseUtils.cursorRowToContentValues(cursor, uriData);

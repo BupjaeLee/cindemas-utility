@@ -120,9 +120,9 @@ public class CardProvider extends ContentProvider {
                         "stat.max_final_defense AS max_defense, " +
                         "ROUND(CAST(stat.max_final_attack AS REAL) / CAST(card_data.cost AS REAL), 2) AS rate_attack, " +
                         "ROUND(CAST(stat.max_final_defense AS REAL) / CAST(card_data.cost AS REAL), 2) AS rate_defense, " +
-                        "'content://bupjae.android.cindemasutility.image/card/xs/' || card_data.card_id || '.png' AS icon_uri, " +
-                        "'content://bupjae.android.cindemasutility.image/card/l/' || card_data.card_id || '.png' AS image_uri, " +
-                        "'content://bupjae.android.cindemasutility.image/card/xl/' || card_data.card_id || '.webp' AS image_noframe_uri, " +
+                        "'content://" + ImageProvider.AUTHORITY + "/card/xs/' || card_data.card_id || '.png' AS icon_uri, " +
+                        "'content://" + ImageProvider.AUTHORITY + "/card/l/' || card_data.card_id || '.png' AS image_uri, " +
+                        "'content://" + ImageProvider.AUTHORITY + "/card/xl/' || card_data.card_id || '.webp' AS image_noframe_uri, " +
                         "card_data.skill_name AS skill_name, " +
                         "REPLACE(card_data.skill_effect, '\\n', ' ') AS skill_effect, " +
                         "skill_data.default_skill_effect AS default_skill_effect " +

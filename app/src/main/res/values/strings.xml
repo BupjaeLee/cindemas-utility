@@ -27,4 +27,5 @@
     <string name="sortby_defrate">By DEF/Cost</string>
     <string name="image_framed">Framed</string>
     <string name="image_noframed">No framed</string>
+    <string name="share">Share</string>
 </resources>
