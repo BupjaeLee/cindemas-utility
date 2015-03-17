@@ -278,12 +278,13 @@ public class IdolProfileActivity extends Activity {
             if (uriData == null) return;
             String uriString = uriData.getAsString(currentType.toString());
             if (uriString == null) return;
-            aq(R.id.info_card_image).getImageView().setImageURI(Uri.parse(uriString));
+            Uri uri = Uri.parse(uriString);
+            aq(R.id.info_card_image).getImageView().setImageURI(uri);
 
             Intent shareIntent = new Intent();
             shareIntent.setAction(Intent.ACTION_SEND);
-            shareIntent.putExtra(Intent.EXTRA_STREAM, Uri.parse(uriString));
-            shareIntent.setType(getActivity().getContentResolver().getType(Uri.parse(uriString)));
+            shareIntent.putExtra(Intent.EXTRA_STREAM, uri);
+            shareIntent.setType(getActivity().getContentResolver().getType(uri));
             shareActionProvider.setShareIntent(shareIntent);
         }
 

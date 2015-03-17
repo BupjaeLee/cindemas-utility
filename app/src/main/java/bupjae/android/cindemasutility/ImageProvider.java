@@ -3,9 +3,11 @@ package bupjae.android.cindemasutility;
 import android.content.ContentProvider;
 import android.content.ContentValues;
 import android.database.Cursor;
+import android.database.MatrixCursor;
 import android.net.Uri;
 import android.os.Environment;
 import android.os.ParcelFileDescriptor;
+import android.provider.OpenableColumns;
 import android.util.Log;
 
 import java.io.ByteArrayOutputStream;
@@ -32,8 +34,23 @@ public class ImageProvider extends ContentProvider {
 
     @Override
     public Cursor query(Uri uri, String[] projection, String selection, String[] selectionArgs, String sortOrder) {
-        // TODO: implement cursor with OpenableColumns
-        return null;
+        if (projection == null)
+            projection = new String[]{OpenableColumns.DISPLAY_NAME, OpenableColumns.SIZE};
+        MatrixCursor ret = new MatrixCursor(projection, 1);
+        MatrixCursor.RowBuilder builder = ret.newRow();
+        for (String column : projection) {
+            switch (column) {
+                case OpenableColumns.DISPLAY_NAME:
+                    builder.add(uri.getLastPathSegment());
+                    break;
+                case OpenableColumns.SIZE:
+                    builder.add(getOriginalFile(uri).length());
+                    break;
+                default:
+                    builder.add(null);
+            }
+        }
+        return ret;
     }
 
     @Override
