@@ -1,0 +1,149 @@
+<?xml version="1.0" encoding="utf-8"?>
+<TableLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    style="@style/IdolProfileFragment"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+
+    <TableRow>
+
+        <TextView
+            style="@style/DetailName"
+            android:text="@string/info_name"
+            android:textAppearance="?android:attr/textAppearanceMedium" />
+
+        <TextView
+            android:id="@+id/info_kana"
+            style="@style/DetailValue"
+            android:textAppearance="?android:attr/textAppearanceMedium" />
+    </TableRow>
+
+    <TableRow>
+
+        <TextView
+            style="@style/DetailName"
+            android:text="@string/info_age"
+            android:textAppearance="?android:attr/textAppearanceMedium" />
+
+        <TextView
+            android:id="@+id/info_age"
+            style="@style/DetailValue"
+            android:textAppearance="?android:attr/textAppearanceMedium" />
+    </TableRow>
+
+    <TableRow>
+
+        <TextView
+            style="@style/DetailName"
+            android:text="@string/info_height"
+            android:textAppearance="?android:attr/textAppearanceMedium" />
+
+        <TextView
+            android:id="@+id/info_height"
+            style="@style/DetailValue"
+            android:textAppearance="?android:attr/textAppearanceMedium" />
+    </TableRow>
+
+    <TableRow>
+
+        <TextView
+            style="@style/DetailName"
+            android:text="@string/info_weight"
+            android:textAppearance="?android:attr/textAppearanceMedium" />
+
+        <TextView
+            android:id="@+id/info_weight"
+            style="@style/DetailValue"
+            android:textAppearance="?android:attr/textAppearanceMedium" />
+    </TableRow>
+
+    <TableRow>
+
+        <TextView
+            style="@style/DetailName"
+            android:text="@string/info_bwh"
+            android:textAppearance="?android:attr/textAppearanceMedium" />
+
+        <TextView
+            android:id="@+id/info_bwh"
+            style="@style/DetailValue"
+            android:textAppearance="?android:attr/textAppearanceMedium" />
+    </TableRow>
+
+    <TableRow>
+
+        <TextView
+            style="@style/DetailName"
+            android:text="@string/info_birthday"
+            android:textAppearance="?android:attr/textAppearanceMedium" />
+
+        <TextView
+            android:id="@+id/info_birthday"
+            style="@style/DetailValue"
+            android:textAppearance="?android:attr/textAppearanceMedium" />
+    </TableRow>
+
+    <TableRow>
+
+        <TextView
+            style="@style/DetailName"
+            android:text="@string/info_constellation"
+            android:textAppearance="?android:attr/textAppearanceMedium" />
+
+        <TextView
+            android:id="@+id/info_constellation"
+            style="@style/DetailValue"
+            android:textAppearance="?android:attr/textAppearanceMedium" />
+    </TableRow>
+
+    <TableRow>
+
+        <TextView
+            style="@style/DetailName"
+            android:text="@string/info_blood"
+            android:textAppearance="?android:attr/textAppearanceMedium" />
+
+        <TextView
+            android:id="@+id/info_blood"
+            style="@style/DetailValue"
+            android:textAppearance="?android:attr/textAppearanceMedium" />
+    </TableRow>
+
+    <TableRow>
+
+        <TextView
+            style="@style/DetailName"
+            android:text="@string/info_arm"
+            android:textAppearance="?android:attr/textAppearanceMedium" />
+
+        <TextView
+            android:id="@+id/info_arm"
+            style="@style/DetailValue"
+            android:textAppearance="?android:attr/textAppearanceMedium" />
+    </TableRow>
+
+    <TableRow>
+
+        <TextView
+            style="@style/DetailName"
+            android:text="@string/info_from"
+            android:textAppearance="?android:attr/textAppearanceMedium" />
+
+        <TextView
+            android:id="@+id/info_from"
+            style="@style/DetailValue"
+            android:textAppearance="?android:attr/textAppearanceMedium" />
+    </TableRow>
+
+    <TableRow>
+
+        <TextView
+            style="@style/DetailName"
+            android:text="@string/info_hobby"
+            android:textAppearance="?android:attr/textAppearanceMedium" />
+
+        <TextView
+            android:id="@+id/info_hobby"
+            style="@style/DetailValue"
+            android:textAppearance="?android:attr/textAppearanceMedium" />
+    </TableRow>
+</TableLayout>

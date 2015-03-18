@@ -28,4 +28,18 @@
     <string name="image_framed">Framed</string>
     <string name="image_noframed">No framed</string>
     <string name="share">Share</string>
+    <string name="info_height_template" translatable="false">%s cm</string>
+    <string name="info_weight_template" translatable="false">%s kg</string>
+    <string name="info_bwh_template" translatable="false">%s/%s/%s</string>
+    <string name="info_name">Name:</string>
+    <string name="info_age">Age:</string>
+    <string name="info_height">Height:</string>
+    <string name="info_weight">Weight:</string>
+    <string name="info_bwh">B-W-H:</string>
+    <string name="info_birthday">Birthday:</string>
+    <string name="info_constellation">Constellation:</string>
+    <string name="info_blood">Blood type:</string>
+    <string name="info_arm">Arm:</string>
+    <string name="info_from">From:</string>
+    <string name="info_hobby">Hobby:</string>
 </resources>

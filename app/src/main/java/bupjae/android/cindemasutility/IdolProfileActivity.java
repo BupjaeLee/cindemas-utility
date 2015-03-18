@@ -139,6 +139,8 @@ public class IdolProfileActivity extends Activity {
                     case 1:
                         return Fragment.instantiate(IdolProfileActivity.this, BasicProfileFragment.class.getName(), arg);
                     case 2:
+                        return Fragment.instantiate(IdolProfileActivity.this, DetailProfileFragment.class.getName(), arg);
+                    case 3:
                         return Fragment.instantiate(IdolProfileActivity.this, CommentFragment.class.getName(), arg);
                     default:
                         return null;
@@ -147,7 +149,7 @@ public class IdolProfileActivity extends Activity {
 
             @Override
             public int getCount() {
-                return 3;
+                return 4;
             }
 
             @Override
@@ -158,6 +160,8 @@ public class IdolProfileActivity extends Activity {
                     case 1:
                         return "Basic";
                     case 2:
+                        return "Detail";
+                    case 3:
                         return "Comments";
                     default:
                         return super.getPageTitle(position);
@@ -369,6 +373,46 @@ public class IdolProfileActivity extends Activity {
                                     cardData.getAsInteger("default_skill_effect")));
                     aq(R.id.info_skill_row).visible();
                 }
+            }
+        }
+
+        @Override
+        public void onLoaderReset(Loader<Cursor> loader) {
+        }
+    }
+
+    public static class DetailProfileFragment extends AbstractProfileFragment {
+
+        @Override
+        protected int getLayoutId() {
+            return R.layout.fragment_idol_detail_profile;
+        }
+
+        @Override
+        public Loader<Cursor> onCreateLoader(int id, Bundle args) {
+            return new CursorLoader(getActivity(), Uri.parse("content://bupjae.android.cindemasutility.card/detail/" + cardId()), null, null, null, null);
+        }
+
+        @Override
+        public void onLoadFinished(Loader<Cursor> loader, Cursor cursor) {
+            if (cursor.moveToFirst()) {
+                ContentValues cardData = new ContentValues();
+                DatabaseUtils.cursorRowToContentValues(cursor, cardData);
+
+                aq(R.id.info_kana).text(cardData.getAsString("card_kana"));
+                aq(R.id.info_age).text(cardData.getAsString("card_age"));
+                aq(R.id.info_height).text(R.string.info_height_template, cardData.getAsString("card_height"));
+                aq(R.id.info_weight).text(R.string.info_weight_template, cardData.getAsString("card_weight"));
+                aq(R.id.info_bwh).text(R.string.info_bwh_template,
+                        cardData.getAsString("card_bust"),
+                        cardData.getAsString("card_waist"),
+                        cardData.getAsString("card_hip"));
+                aq(R.id.info_birthday).text(cardData.getAsString("card_birthday"));
+                aq(R.id.info_constellation).text(cardData.getAsString("card_constellation"));
+                aq(R.id.info_blood).text(cardData.getAsString("card_blood"));
+                aq(R.id.info_arm).text(cardData.getAsString("card_arm"));
+                aq(R.id.info_from).text(cardData.getAsString("card_from"));
+                aq(R.id.info_hobby).text(cardData.getAsString("card_hobby").replace("\\n", "\n"));
             }
         }
 

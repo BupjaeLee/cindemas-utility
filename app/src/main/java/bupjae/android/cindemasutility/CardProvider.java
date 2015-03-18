@@ -24,6 +24,7 @@ public class CardProvider extends ContentProvider {
     private static final String CARD_BIRTHDAY_FILENAME = "data/csv/idol_birthday.db";
     private static final String CARD_SKILLDATA_FILENAME = "data/csv/skill_data.db";
     private static final String CARD_VCOMMENT_FILENAME = "data/csv/v_comment.db";
+    private static final String CARD_PROFILE_FILENAME = "data/csv/card_profile.db";
 
     private static final int CODE_BASE = 1;
     private static final int CODE_BASE_ID = 2;
@@ -33,6 +34,8 @@ public class CardProvider extends ContentProvider {
     private static final int CODE_COMMENTS_ID = 7;
     private static final int CODE_STAT_ID = 8;
     private static final int CODE_IMAGEURI_ID = 9;
+    private static final int CODE_DETAIL = 10;
+    private static final int CODE_DETAIL_ID = 11;
     private static final UriMatcher uriMatcher = new UriMatcher(UriMatcher.NO_MATCH);
 
     private File baseDir;
@@ -47,6 +50,8 @@ public class CardProvider extends ContentProvider {
         uriMatcher.addURI(AUTHORITY, "comments/#", CODE_COMMENTS_ID);
         uriMatcher.addURI(AUTHORITY, "stat/#", CODE_STAT_ID);
         uriMatcher.addURI(AUTHORITY, "imageuri/#", CODE_IMAGEURI_ID);
+        uriMatcher.addURI(AUTHORITY, "detail", CODE_DETAIL);
+        uriMatcher.addURI(AUTHORITY, "detail/#", CODE_DETAIL_ID);
     }
 
     @Override
@@ -93,6 +98,7 @@ public class CardProvider extends ContentProvider {
                 db.execSQL("ATTACH DATABASE ? AS card_comments", new Object[]{new File(baseDir, CARD_COMMENTS_FILENAME).toString()});
                 db.execSQL("ATTACH DATABASE ? AS idol_birthday", new Object[]{new File(baseDir, CARD_BIRTHDAY_FILENAME).toString()});
                 db.execSQL("ATTACH DATABASE ? AS skill_data", new Object[]{new File(baseDir, CARD_SKILLDATA_FILENAME).toString()});
+                db.execSQL("ATTACH DATABASE ? AS card_profile", new Object[]{new File(baseDir, CARD_PROFILE_FILENAME).toString()});
                 if (new File(baseDir, CARD_VCOMMENT_FILENAME).exists()) {
                     db.execSQL("ATTACH DATABASE ? AS v_comment", new Object[]{new File(baseDir, CARD_VCOMMENT_FILENAME).toString()});
                 } else {
@@ -256,6 +262,10 @@ public class CardProvider extends ContentProvider {
                 return "vnd.android.cursor.item/vnd.bupjae.android.cindemasutility.card.stat";
             case CODE_IMAGEURI_ID:
                 return "vnd.android.cursor.item/vnd.bupjae.android.cindemasutility.card.imageuri";
+            case CODE_DETAIL:
+                return "vnd.android.cursor.dir/vnd.bupjae.android.cindemasutility.card.detail";
+            case CODE_DETAIL_ID:
+                return "vnd.android.cursor.item/vnd.bupjae.android.cindemasutility.card.detail";
             default:
                 return null;
         }
@@ -310,6 +320,14 @@ public class CardProvider extends ContentProvider {
                         "content://bupjae.android.cindemasutility.image/card/xl/" + uri.getLastPathSegment() + ".webp",
                 });
                 return ret;
+            }
+            case CODE_DETAIL_ID: {
+                selection = "(" + selection + ") AND card_id = ?";
+                selectionArgs = DatabaseUtils.appendSelectionArgs(selectionArgs, new String[]{uri.getLastPathSegment()});
+            }
+            // FALL_THROUGH
+            case CODE_DETAIL: {
+                return helper.getReadableDatabase().query("card_profile", projection, selection, selectionArgs, null, null, sortOrder);
             }
             default:
                 throw new IllegalArgumentException("Unknown URI : " + uri);

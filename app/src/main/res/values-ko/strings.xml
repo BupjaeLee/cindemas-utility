@@ -28,4 +28,15 @@
     <string name="info_max_attack">MATK:</string>
     <string name="info_max_defense">MDEF:</string>
     <string name="share">공유</string>
+    <string name="info_name">이름:</string>
+    <string name="info_age">나이:</string>
+    <string name="info_height">키:</string>
+    <string name="info_weight">몸무게:</string>
+    <string name="info_bwh">B-W-H:</string>
+    <string name="info_birthday">생일:</string>
+    <string name="info_constellation">별자리:</string>
+    <string name="info_arm">자주쓰는 손:</string>
+    <string name="info_from">출신지:</string>
+    <string name="info_hobby">취미:</string>
+    <string name="info_blood">혈액형:</string>
 </resources>
