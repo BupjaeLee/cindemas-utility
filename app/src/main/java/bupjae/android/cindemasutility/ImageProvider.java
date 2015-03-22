@@ -46,6 +46,9 @@ public class ImageProvider extends ContentProvider {
                 case OpenableColumns.SIZE:
                     builder.add(getOriginalFile(uri).length());
                     break;
+                case "_data":
+                    builder.add(getConvertedFile(uri).toString());
+                    break;
                 default:
                     builder.add(null);
             }
@@ -63,33 +66,11 @@ public class ImageProvider extends ContentProvider {
             throw new FileNotFoundException("Not found: " + original);
         }
         File converted = getConvertedFile(uri);
-        if (!converted.exists()) {
-            //noinspection ResultOfMethodCallIgnored
-            converted.getParentFile().mkdirs();
-            byte[] data = readFully(original);
-            byte mask;
-            switch (getType(uri)) {
-                case "image/png":
-                    mask = (byte) (data[0] ^ 137);
-                    break;
-                case "image/webp":
-                    mask = (byte) (data[0] ^ 'R');
-                    break;
-                default:
-                    mask = 0;
-            }
-            for (int i = 0; i < 50; i++) data[i] ^= mask;
-            FileOutputStream fout = new FileOutputStream(converted);
+        if (!converted.exists() || converted.lastModified() < original.lastModified() || converted.length() != original.length()) {
             try {
-                fout.write(data);
+                prepareFile(original, converted, getType(uri));
             } catch (IOException ex) {
-                Log.e(TAG, "openFile: Write failure", ex);
-            } finally {
-                try {
-                    fout.close();
-                } catch (IOException ex) {
-                    Log.e(TAG, "openFile: Write failure", ex);
-                }
+                Log.e(TAG, "openFile: prepareFile failed", ex);
             }
         }
         return ParcelFileDescriptor.open(converted, ParcelFileDescriptor.MODE_READ_ONLY);
@@ -132,19 +113,49 @@ public class ImageProvider extends ContentProvider {
         return new File(getContext().getExternalFilesDir(Environment.DIRECTORY_PICTURES), uri.getPath());
     }
 
-    private static byte[] readFully(File file) throws FileNotFoundException {
-        InputStream fin = new FileInputStream(file);
-        ByteArrayOutputStream out = new ByteArrayOutputStream();
-        byte[] buf = new byte[1024];
+    private static void prepareFile(File original, File converted, String type) throws IOException {
+        //noinspection ResultOfMethodCallIgnored
+        converted.getParentFile().mkdirs();
+        byte[] data = readFully(original);
+        byte mask;
+        switch (type) {
+            case "image/png":
+                mask = (byte) (data[0] ^ 137);
+                break;
+            case "image/webp":
+                mask = (byte) (data[0] ^ 'R');
+                break;
+            default:
+                mask = 0;
+        }
+        for (int i = 0; i < 50; i++) data[i] ^= mask;
+        FileOutputStream fout = new FileOutputStream(converted);
+        //noinspection TryFinallyCanBeTryWithResources
         try {
+            fout.write(data);
+        } finally {
+            fout.close();
+        }
+    }
+
+    private static byte[] readFully(File file) throws IOException {
+        InputStream fin = new FileInputStream(file);
+        //noinspection TryFinallyCanBeTryWithResources
+        try {
+            ByteArrayOutputStream out = new ByteArrayOutputStream();
+            byte[] buf = new byte[1024];
             while (true) {
                 int n = fin.read(buf);
                 if (n == -1) break;
                 out.write(buf, 0, n);
             }
-        } catch (IOException ex) {
-            Log.e(TAG, "readFully(): reading failed", ex);
+            return out.toByteArray();
+        } finally {
+            try {
+                fin.close();
+            } catch (IOException ex) {
+                Log.e(TAG, "prepareFile: failed closing original file", ex);
+            }
         }
-        return out.toByteArray();
     }
 }
