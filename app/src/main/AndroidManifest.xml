@@ -3,6 +3,7 @@
     package="bupjae.android.cindemasutility">
 
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+
     <application
         android:allowBackup="true"
         android:icon="@drawable/ic_launcher"
@@ -13,22 +14,28 @@
             android:label="@string/title_idol_select">
             <intent-filter android:label="@string/app_name">
                 <action android:name="android.intent.action.MAIN" />
+
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
         <activity
             android:name=".IdolProfileActivity"
-            android:label="@string/title_activity_profile" />
+            android:label="@string/title_idol_profile" />
+        <activity
+            android:name=".EasterEggYayoiActivity"
+            android:label="@string/title_easter_egg_yayoi" />
 
         <provider
             android:name=".CardProvider"
             android:authorities="bupjae.android.cindemasutility.card"
             android:exported="false" />
-
         <provider
             android:name=".ImageProvider"
             android:authorities="bupjae.android.cindemasutility.image"
             android:exported="false"
             android:grantUriPermissions="true" />
+
+
     </application>
+
 </manifest>

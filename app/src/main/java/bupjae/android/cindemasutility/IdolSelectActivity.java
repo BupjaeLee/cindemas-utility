@@ -5,6 +5,7 @@ import android.app.LoaderManager;
 import android.content.CursorLoader;
 import android.content.Intent;
 import android.content.Loader;
+import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
@@ -19,6 +20,9 @@ import android.widget.SearchView;
 import android.widget.SimpleCursorAdapter;
 
 import com.androidquery.AQuery;
+
+import java.util.Calendar;
+import java.util.TimeZone;
 
 public class IdolSelectActivity extends Activity {
     @SuppressWarnings("UnusedDeclaration")
@@ -101,6 +105,21 @@ public class IdolSelectActivity extends Activity {
         getLoaderManager().initLoader(0, null, cursorCallback);
     }
 
+    @Override
+    protected void onResume() {
+        super.onResume();
+
+        Calendar now = Calendar.getInstance(TimeZone.getTimeZone("Asia/Tokyo"));
+        if (now.get(Calendar.MONTH) == Calendar.MARCH && now.get(Calendar.DAY_OF_MONTH) == 25) {
+            SharedPreferences preference = getPreferences(MODE_PRIVATE);
+            int current = now.get(Calendar.YEAR);
+            int last = preference.getInt("easteregg_yayoi_last", 0);
+            if (last < current + 1) {
+                preference.edit().putInt("easteregg_yayoi_last", current).apply();
+                startActivity(new Intent(this, EasterEggYayoiActivity.class));
+            }
+        }
+    }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -175,7 +194,7 @@ public class IdolSelectActivity extends Activity {
         Intent intent = new Intent();
         intent.putExtra(EXTRA_CARD_ID, id);
         if (getIntent().getAction().equals(Intent.ACTION_MAIN)) {
-            intent.setClass(IdolSelectActivity.this, IdolProfileActivity.class);
+            intent.setClass(this, IdolProfileActivity.class);
             startActivity(intent);
         } else {
             setResult(Activity.RESULT_OK, intent);

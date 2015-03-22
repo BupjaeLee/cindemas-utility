@@ -3,7 +3,7 @@
     <string name="app_name">Cindemas Utility</string>
     <string name="description_card_image">card image</string>
     <string name="title_idol_select">Select idol</string>
-    <string name="title_activity_profile">Idol profile</string>
+    <string name="title_idol_profile">Idol profile</string>
     <string name="info_rarity">Rarity:</string>
     <string name="info_cost">Cost:</string>
     <string name="info_maxlevel">Max level:</string>
@@ -42,4 +42,5 @@
     <string name="info_arm">Arm:</string>
     <string name="info_from">From:</string>
     <string name="info_hobby">Hobby:</string>
+    <string name="title_easter_egg_yayoi">Happy Birthday Yayoi!</string>
 </resources>

@@ -2,7 +2,7 @@
 <resources>
     <string name="app_name">신데마스 보조 프로그램</string>
     <string name="title_idol_select">아이돌 선택</string>
-    <string name="title_activity_profile">아이돌 프로필</string>
+    <string name="title_idol_profile">아이돌 프로필</string>
     <string name="info_rarity">레어도:</string>
     <string name="info_cost">코스트:</string>
     <string name="info_maxlevel">최대레벨:</string>
@@ -39,4 +39,5 @@
     <string name="info_from">출신지:</string>
     <string name="info_hobby">취미:</string>
     <string name="info_blood">혈액형:</string>
+    <string name="title_easter_egg_yayoi">생일 축하해 야요이!</string>
 </resources>
