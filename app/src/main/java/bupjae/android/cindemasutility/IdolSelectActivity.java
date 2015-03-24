@@ -114,7 +114,7 @@ public class IdolSelectActivity extends Activity {
             SharedPreferences preference = getPreferences(MODE_PRIVATE);
             int current = now.get(Calendar.YEAR);
             int last = preference.getInt("easteregg_yayoi_last", 0);
-            if (last < current + 1) {
+            if (last < current) {
                 preference.edit().putInt("easteregg_yayoi_last", current).apply();
                 startActivity(new Intent(this, EasterEggYayoiActivity.class));
             }
