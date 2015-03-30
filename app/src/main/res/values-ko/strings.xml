@@ -40,4 +40,5 @@
     <string name="info_hobby">취미:</string>
     <string name="info_blood">혈액형:</string>
     <string name="title_easter_egg_yayoi">생일 축하해 야요이!</string>
+    <string name="filter_rarity">레어도</string>
 </resources>

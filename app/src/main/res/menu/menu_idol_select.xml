@@ -34,4 +34,34 @@
             </group>
         </menu>
     </item>
+    <item
+        android:icon="@drawable/ic_menu_filter"
+        android:showAsAction="always"
+        android:title="@string/filter_rarity">
+        <menu>
+            <group
+                android:id="@+id/filter_rarity"
+                android:checkableBehavior="all">
+                <item
+                    android:id="@+id/filter_rarity_6"
+                    android:title="@string/filter_rarity_6" />
+                <item
+                    android:id="@+id/filter_rarity_5"
+                    android:title="@string/filter_rarity_5" />
+                <item
+                    android:id="@+id/filter_rarity_4"
+                    android:title="@string/filter_rarity_4" />
+                <item
+                    android:id="@+id/filter_rarity_3"
+                    android:title="@string/filter_rarity_3" />
+                <item
+                    android:id="@+id/filter_rarity_2"
+                    android:title="@string/filter_rarity_2" />
+                <item
+                    android:id="@+id/filter_rarity_1"
+                    android:title="@string/filter_rarity_1" />
+            </group>
+        </menu>
+
+    </item>
 </menu>

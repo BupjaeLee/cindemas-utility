@@ -43,4 +43,11 @@
     <string name="info_from">From:</string>
     <string name="info_hobby">Hobby:</string>
     <string name="title_easter_egg_yayoi">Happy Birthday Yayoi!</string>
+    <string name="filter_rarity">By Rarity</string>
+    <string name="filter_rarity_6" translatable="false">SR+</string>
+    <string name="filter_rarity_5" translatable="false">SR</string>
+    <string name="filter_rarity_4" translatable="false">R+</string>
+    <string name="filter_rarity_3" translatable="false">R</string>
+    <string name="filter_rarity_2" translatable="false">N+</string>
+    <string name="filter_rarity_1" translatable="false">N</string>
 </resources>

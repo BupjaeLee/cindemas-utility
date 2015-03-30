@@ -31,8 +31,11 @@ public class IdolSelectActivity extends Activity {
 
     private AQuery aq;
     private CursorAdapter adapter;
+    private Menu menu;
+
     private String query;
     private String sortOrder;
+    private String filter;
 
     private LoaderManager.LoaderCallbacks<Cursor> cursorCallback = new LoaderManager.LoaderCallbacks<Cursor>() {
         @Override
@@ -45,7 +48,7 @@ public class IdolSelectActivity extends Activity {
                             IdolSelectActivity.this,
                             Uri.parse("content://bupjae.android.cindemasutility.card/base"),
                             new String[]{"*", "card_id AS _id"},
-                            "card_name GLOB ?",
+                            "card_name GLOB ?" + (filter == null ? "" : " AND rarity IN (" + filter + ")"),
                             new String[]{"*" + query + "*"},
                             sortOrder);
                 default:
@@ -124,6 +127,7 @@ public class IdolSelectActivity extends Activity {
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.menu_idol_select, menu);
+        this.menu = menu;
 
         SearchView searchView = (SearchView) menu.findItem(R.id.search).getActionView();
         searchView.setQueryHint(getResources().getString(R.string.search_hint));
@@ -183,10 +187,17 @@ public class IdolSelectActivity extends Activity {
                 sortOrder = "rate_defense DESC";
                 getLoaderManager().restartLoader(0, null, cursorCallback);
                 return true;
+            case R.id.filter_rarity_1:
+            case R.id.filter_rarity_2:
+            case R.id.filter_rarity_3:
+            case R.id.filter_rarity_4:
+            case R.id.filter_rarity_5:
+            case R.id.filter_rarity_6:
+                item.setChecked(!item.isChecked());
+                filterChanged();
             default:
                 return super.onMenuItemSelected(featureId, item);
         }
-
     }
 
     @SuppressWarnings("UnusedDeclaration")
@@ -200,5 +211,31 @@ public class IdolSelectActivity extends Activity {
             setResult(Activity.RESULT_OK, intent);
             finish();
         }
+    }
+
+    private void filterChanged() {
+        if (menu == null) return;
+        StringBuilder builder = new StringBuilder();
+        MenuItem item;
+        if ((item = menu.findItem(R.id.filter_rarity_1)) != null && item.isChecked()) {
+            builder.append(", 'N'");
+        }
+        if ((item = menu.findItem(R.id.filter_rarity_2)) != null && item.isChecked()) {
+            builder.append(", 'N+'");
+        }
+        if ((item = menu.findItem(R.id.filter_rarity_3)) != null && item.isChecked()) {
+            builder.append(", 'R'");
+        }
+        if ((item = menu.findItem(R.id.filter_rarity_4)) != null && item.isChecked()) {
+            builder.append(", 'R+'");
+        }
+        if ((item = menu.findItem(R.id.filter_rarity_5)) != null && item.isChecked()) {
+            builder.append(", 'SR'");
+        }
+        if ((item = menu.findItem(R.id.filter_rarity_6)) != null && item.isChecked()) {
+            builder.append(", 'SR+'");
+        }
+        filter = builder.length() == 0 ? null : builder.substring(2);
+        getLoaderManager().restartLoader(0, null, cursorCallback);
     }
 }
