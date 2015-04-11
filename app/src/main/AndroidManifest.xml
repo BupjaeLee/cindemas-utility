@@ -35,8 +35,5 @@
             android:authorities="bupjae.android.cindemasutility.image"
             android:exported="false"
             android:grantUriPermissions="true" />
-
-
     </application>
-
 </manifest>

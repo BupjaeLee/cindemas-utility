@@ -4,12 +4,12 @@
     <item
         android:id="@+id/search"
         android:actionViewClass="android.widget.SearchView"
-        android:icon="@android:drawable/ic_menu_search"
+        android:icon="@drawable/ic_action_search"
         android:showAsAction="collapseActionView|ifRoom"
         android:title="@string/search_title" />
     <item
-        android:icon="@android:drawable/ic_menu_sort_alphabetically"
-        android:showAsAction="always"
+        android:icon="@drawable/ic_action_sort_by_size"
+        android:showAsAction="ifRoom"
         android:title="@string/sortby">
         <menu>
             <group
@@ -35,33 +35,8 @@
         </menu>
     </item>
     <item
+        android:id="@+id/filter"
         android:icon="@drawable/ic_menu_filter"
-        android:showAsAction="always"
-        android:title="@string/filter_rarity">
-        <menu>
-            <group
-                android:id="@+id/filter_rarity"
-                android:checkableBehavior="all">
-                <item
-                    android:id="@+id/filter_rarity_6"
-                    android:title="@string/filter_rarity_6" />
-                <item
-                    android:id="@+id/filter_rarity_5"
-                    android:title="@string/filter_rarity_5" />
-                <item
-                    android:id="@+id/filter_rarity_4"
-                    android:title="@string/filter_rarity_4" />
-                <item
-                    android:id="@+id/filter_rarity_3"
-                    android:title="@string/filter_rarity_3" />
-                <item
-                    android:id="@+id/filter_rarity_2"
-                    android:title="@string/filter_rarity_2" />
-                <item
-                    android:id="@+id/filter_rarity_1"
-                    android:title="@string/filter_rarity_1" />
-            </group>
-        </menu>
-
-    </item>
+        android:showAsAction="ifRoom"
+        android:title="@string/filter" />
 </menu>
