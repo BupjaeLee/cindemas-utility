@@ -8,8 +8,8 @@ android {
         applicationId "bupjae.android.cindemasutility"
         minSdkVersion 14
         targetSdkVersion 21
-        versionCode 10
-        versionName "0.6"
+        versionCode 11
+        versionName "0.7"
     }
     buildTypes {
         release {

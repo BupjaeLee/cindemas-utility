@@ -254,6 +254,7 @@ public class IdolSelectActivity extends Activity {
     @Override
     protected void onStart() {
         super.onStart();
+        setTitle(R.string.title_idol_select);
         IntentFilter filter = new IntentFilter();
         filter.addAction(ACTION_FILTER_CHANGED);
         LocalBroadcastManager.getInstance(this).registerReceiver(receiver, filter);
