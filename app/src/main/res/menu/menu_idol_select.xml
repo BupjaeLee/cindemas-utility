@@ -4,11 +4,11 @@
     <item
         android:id="@+id/search"
         android:actionViewClass="android.widget.SearchView"
-        android:icon="@drawable/ic_action_search"
+        android:icon="@drawable/ic_action_action_search"
         android:showAsAction="collapseActionView|ifRoom"
         android:title="@string/search_title" />
     <item
-        android:icon="@drawable/ic_action_sort_by_size"
+        android:icon="@drawable/ic_action_content_sort"
         android:showAsAction="ifRoom"
         android:title="@string/sortby">
         <menu>
@@ -36,7 +36,7 @@
     </item>
     <item
         android:id="@+id/filter"
-        android:icon="@drawable/ic_menu_filter"
+        android:icon="@drawable/ic_action_content_filter_list"
         android:showAsAction="ifRoom"
         android:title="@string/filter" />
 </menu>
