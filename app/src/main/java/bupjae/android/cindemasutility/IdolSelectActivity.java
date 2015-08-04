@@ -48,9 +48,11 @@ public class IdolSelectActivity extends Activity {
     private CursorAdapter adapter;
 
     private String query;
+    private String summaryText;
     private String sortOrder;
     private String filterRarity;
     private String filterAttribute;
+    private String filterSkill;
     private ArrayList<Integer> filterConfig;
 
     private LoaderManager.LoaderCallbacks<Cursor> cursorCallback = new LoaderManager.LoaderCallbacks<Cursor>() {
@@ -59,14 +61,17 @@ public class IdolSelectActivity extends Activity {
             switch (i) {
                 case 0:
                     if (query == null) query = "";
+                    if (summaryText == null || summaryText.isEmpty())
+                        summaryText = "max_attack || ' (' || rate_attack || ') / ' || max_defense || ' (' || rate_defense || ')' AS stat_summary";
                     if (sortOrder == null) sortOrder = "";
                     if (filterRarity == null) filterRarity = "";
                     if (filterAttribute == null) filterAttribute = "";
+                    if (filterSkill == null) filterSkill = "";
                     return new CursorLoader(
                             IdolSelectActivity.this,
                             Uri.parse("content://bupjae.android.cindemasutility.card/base"),
-                            new String[]{"*", "card_id AS _id"},
-                            "card_name GLOB ?" + filterRarity + filterAttribute,
+                            new String[]{"*", "card_id AS _id", summaryText},
+                            "card_name GLOB ?" + filterRarity + filterAttribute + filterSkill,
                             new String[]{"*" + query + "*"},
                             sortOrder);
                 default:
@@ -124,6 +129,14 @@ public class IdolSelectActivity extends Activity {
             if (filterConfig.contains(R.id.filter_rarity_6)) builder.append(", 'SR+'");
             filterRarity = builder.length() == 0 ? "" : String.format(" AND rarity IN (%s)", builder.substring(2));
 
+            if (filterConfig.contains(R.id.filter_skill_false) && !filterConfig.contains(R.id.filter_skill_true)) {
+                filterSkill = " AND (skill_name IS NULL OR skill_name = '')";
+            } else if (filterConfig.contains(R.id.filter_skill_true) && !filterConfig.contains(R.id.filter_skill_false)) {
+                filterSkill = " AND (skill_name IS NOT NULL AND skill_name <> '')";
+            } else {
+                filterSkill = "";
+            }
+
             getLoaderManager().restartLoader(0, null, cursorCallback);
         }
     };
@@ -140,11 +153,11 @@ public class IdolSelectActivity extends Activity {
                 null,
                 new String[]{
                         "card_name", "attribute", "rarity", "cost", "icon_uri",
-                        "max_attack", "rate_attack", "max_defense", "rate_defense"
+                        "stat_summary"
                 },
                 new int[]{
                         R.id.info_name, R.id.info_attribute, R.id.info_rarity, R.id.info_cost, R.id.info_icon,
-                        R.id.info_max_attack, R.id.info_rate_attack, R.id.info_max_defense, R.id.info_rate_defense
+                        R.id.info_stat_summary
                 },
                 0);
         aq.id(R.id.list_view).adapter(adapter).itemClicked(this, "onIdolSelected");
@@ -208,26 +221,37 @@ public class IdolSelectActivity extends Activity {
             case R.id.sortby_database:
                 item.setChecked(true);
                 sortOrder = "";
+                summaryText = "max_attack || ' (' || rate_attack || ') / ' || max_defense || ' (' || rate_defense || ')' AS stat_summary";
                 getLoaderManager().restartLoader(0, null, cursorCallback);
                 return true;
             case R.id.sortby_atk:
                 item.setChecked(true);
                 sortOrder = "max_attack DESC";
+                summaryText = "'ATK = ' || max_attack || ' (' || rate_attack || ')' AS stat_summary";
                 getLoaderManager().restartLoader(0, null, cursorCallback);
                 return true;
             case R.id.sortby_def:
                 item.setChecked(true);
                 sortOrder = "max_defense DESC";
+                summaryText = "'DEF = ' || max_defense || ' (' || rate_defense || ')' AS stat_summary";
                 getLoaderManager().restartLoader(0, null, cursorCallback);
                 return true;
             case R.id.sortby_atkrate:
                 item.setChecked(true);
                 sortOrder = "rate_attack DESC";
+                summaryText = "'ATK = ' || max_attack || ' (' || rate_attack || ')' AS stat_summary";
                 getLoaderManager().restartLoader(0, null, cursorCallback);
                 return true;
             case R.id.sortby_defrate:
                 item.setChecked(true);
                 sortOrder = "rate_defense DESC";
+                summaryText = "'DEF = ' || max_defense || ' (' || rate_defense || ')' AS stat_summary";
+                getLoaderManager().restartLoader(0, null, cursorCallback);
+                return true;
+            case R.id.sortby_atkdef:
+                item.setChecked(true);
+                sortOrder = "max_attack+max_defense DESC";
+                summaryText = "'ATK+DEF = ' || (max_attack+max_defense) AS stat_summary";
                 getLoaderManager().restartLoader(0, null, cursorCallback);
                 return true;
             case R.id.filter:
@@ -358,6 +382,8 @@ public class IdolSelectActivity extends Activity {
                     .check(R.id.filter_rarity_4)
                     .check(R.id.filter_rarity_5)
                     .check(R.id.filter_rarity_6)
+                    .check(R.id.filter_skill_false)
+                    .check(R.id.filter_skill_true)
                     .last();
         }
     }

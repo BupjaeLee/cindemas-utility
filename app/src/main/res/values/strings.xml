@@ -56,4 +56,13 @@
     <string name="filter_attribute_all">All</string>
     <string name="filter_attribute">Attribute</string>
     <string name="filter_rarity">Rarity</string>
+    <string name="info_skill_level">Skill Lv</string>
+    <string name="settings">Settings</string>
+    <string name="title_producer_settings">Producer Settings</string>
+    <string name="sortby_atkdef">ATK+DEF</string>
+    <string name="title_activity_office_idol_list">OfficeIdolListActivity</string>
+    <string name="action_settings">Settings</string>
+    <string name="filter_skill">Skill</string>
+    <string name="filter_skill_false">No</string>
+    <string name="filter_skill_true">Yes</string>
 </resources>

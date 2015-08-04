@@ -47,4 +47,13 @@
     <string name="filter_attribute_passion">패션</string>
     <string name="filter_attribute_all">전부</string>
     <string name="filter_attribute">속성</string>
+    <string name="info_skill_level">특기렙</string>
+    <string name="settings">설정</string>
+    <string name="title_producer_settings">프로듀서 설정</string>
+    <string name="title_activity_office_idol_list">OfficeIdolListActivity</string>
+    <string name="sortby_atkdef">공방합</string>
+    <string name="action_settings">설정</string>
+    <string name="filter_skill">특기</string>
+    <string name="filter_skill_false">없음</string>
+    <string name="filter_skill_true">있음</string>
 </resources>

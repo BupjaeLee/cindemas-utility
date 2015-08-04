@@ -318,7 +318,7 @@ public class IdolProfileActivity extends Activity {
 
             private final int widgetId;
 
-            private ImageType(int widgetId) {
+            ImageType(int widgetId) {
                 this.widgetId = widgetId;
             }
 
@@ -368,9 +368,10 @@ public class IdolProfileActivity extends Activity {
                 } else {
                     aq(R.id.info_skill_name).text(skillName);
                     aq(R.id.info_skill_effect).text(
-                            String.format("%s (%d%%~)",
+                            String.format("%s (%d%%~%d%%)",
                                     cardData.getAsString("skill_effect"),
-                                    cardData.getAsInteger("default_skill_effect")));
+                                    cardData.getAsInteger("default_skill_effect"),
+                                    cardData.getAsInteger("max_skill_effect")));
                     aq(R.id.info_skill_row).visible();
                 }
             }

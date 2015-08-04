@@ -69,59 +69,11 @@
                 android:layout_height="wrap_content" />
         </LinearLayout>
 
-        <LinearLayout
+        <TextView
+            android:id="@+id/info_stat_summary"
+            style="SecondaryText"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal">
-
-            <TextView
-                android:id="@+id/info_max_attack"
-                style="SecondaryText"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content" />
-
-            <TextView
-                style="SecondaryText"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text=" (" />
-
-            <TextView
-                android:id="@+id/info_rate_attack"
-                style="SecondaryText"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content" />
-
-            <TextView
-                style="SecondaryText"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text=") / " />
-
-            <TextView
-                android:id="@+id/info_max_defense"
-                style="SecondaryText"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content" />
-
-            <TextView
-                style="SecondaryText"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text=" (" />
-
-            <TextView
-                android:id="@+id/info_rate_defense"
-                style="SecondaryText"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content" />
-
-            <TextView
-                style="SecondaryText"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text=")" />
-        </LinearLayout>
+            android:layout_height="wrap_content" />
     </LinearLayout>
 
 </LinearLayout>

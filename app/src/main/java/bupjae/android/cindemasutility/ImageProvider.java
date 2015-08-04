@@ -110,7 +110,11 @@ public class ImageProvider extends ContentProvider {
     }
 
     private File getConvertedFile(Uri uri) {
-        return new File(getContext().getExternalFilesDir(Environment.DIRECTORY_PICTURES), uri.getPath());
+        File dir = getContext().getExternalFilesDir(Environment.DIRECTORY_PICTURES);
+        if (!Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED)) {
+            dir = getContext().getDir(Environment.DIRECTORY_PICTURES, 0);
+        }
+        return new File(dir, uri.getPath());
     }
 
     private static void prepareFile(File original, File converted, String type) throws IOException {

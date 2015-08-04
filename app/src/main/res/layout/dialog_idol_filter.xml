@@ -116,4 +116,35 @@
         </TableRow>
     </TableLayout>
 
+    <Space
+        android:layout_width="match_parent"
+        android:layout_height="16dp" />
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/filter_skill"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        />
+
+    <LinearLayout
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <CheckBox
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:text="@string/filter_skill_false"
+            android:id="@+id/filter_skill_false"
+            android:layout_weight="1" />
+
+        <CheckBox
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:text="@string/filter_skill_true"
+            android:id="@+id/filter_skill_true"
+            android:layout_weight="1" />
+    </LinearLayout>
+
 </LinearLayout>

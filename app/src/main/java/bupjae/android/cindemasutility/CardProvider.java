@@ -15,6 +15,8 @@ import android.util.Log;
 import java.io.File;
 
 public class CardProvider extends ContentProvider {
+    // http://sourceforge.net/projects/vgmtoolbox :: CRI-HCA extractor
+    // http://www.mediafire.com/?858tqikj74qinw4 :: HCA decoder
     public static final String AUTHORITY = "bupjae.android.cindemasutility.card";
 
     private static final String TAG = CardProvider.class.getSimpleName();
@@ -25,6 +27,7 @@ public class CardProvider extends ContentProvider {
     private static final String CARD_SKILLDATA_FILENAME = "data/csv/skill_data.db";
     private static final String CARD_VCOMMENT_FILENAME = "data/csv/v_comment.db";
     private static final String CARD_PROFILE_FILENAME = "data/csv/card_profile.db";
+    private static final String CARD_GACHA_COMMENTS_FILENAME = "data/csv/gacha_sr_win_comments.db";
 
     private static final int CODE_BASE = 1;
     private static final int CODE_BASE_ID = 2;
@@ -36,6 +39,7 @@ public class CardProvider extends ContentProvider {
     private static final int CODE_IMAGEURI_ID = 9;
     private static final int CODE_DETAIL = 10;
     private static final int CODE_DETAIL_ID = 11;
+    private static final int CODE_CALCULATE_ID = 12;
     private static final UriMatcher uriMatcher = new UriMatcher(UriMatcher.NO_MATCH);
 
     private File baseDir;
@@ -52,6 +56,7 @@ public class CardProvider extends ContentProvider {
         uriMatcher.addURI(AUTHORITY, "imageuri/#", CODE_IMAGEURI_ID);
         uriMatcher.addURI(AUTHORITY, "detail", CODE_DETAIL);
         uriMatcher.addURI(AUTHORITY, "detail/#", CODE_DETAIL_ID);
+        uriMatcher.addURI(AUTHORITY, "calculate/#", CODE_CALCULATE_ID);
     }
 
     @Override
@@ -99,6 +104,7 @@ public class CardProvider extends ContentProvider {
                 db.execSQL("ATTACH DATABASE ? AS idol_birthday", new Object[]{new File(baseDir, CARD_BIRTHDAY_FILENAME).toString()});
                 db.execSQL("ATTACH DATABASE ? AS skill_data", new Object[]{new File(baseDir, CARD_SKILLDATA_FILENAME).toString()});
                 db.execSQL("ATTACH DATABASE ? AS card_profile", new Object[]{new File(baseDir, CARD_PROFILE_FILENAME).toString()});
+                db.execSQL("ATTACH DATABASE ? AS gacha_sr_win_comments", new Object[]{new File(baseDir, CARD_GACHA_COMMENTS_FILENAME).toString()});
                 if (new File(baseDir, CARD_VCOMMENT_FILENAME).exists()) {
                     db.execSQL("ATTACH DATABASE ? AS v_comment", new Object[]{new File(baseDir, CARD_VCOMMENT_FILENAME).toString()});
                 } else {
@@ -127,11 +133,37 @@ public class CardProvider extends ContentProvider {
                         "ROUND(CAST(stat.max_final_attack AS REAL) / CAST(card_data.cost AS REAL), 2) AS rate_attack, " +
                         "ROUND(CAST(stat.max_final_defense AS REAL) / CAST(card_data.cost AS REAL), 2) AS rate_defense, " +
                         "'content://" + ImageProvider.AUTHORITY + "/card/xs/' || card_data.card_id || '.png' AS icon_uri, " +
-                        "'content://" + ImageProvider.AUTHORITY + "/card/l/' || card_data.card_id || '.png' AS image_uri, " +
-                        "'content://" + ImageProvider.AUTHORITY + "/card/xl/' || card_data.card_id || '.webp' AS image_noframe_uri, " +
                         "card_data.skill_name AS skill_name, " +
                         "REPLACE(card_data.skill_effect, '\\n', ' ') AS skill_effect, " +
-                        "skill_data.default_skill_effect AS default_skill_effect " +
+                        "skill_data.default_skill_effect AS default_skill_effect, " +
+                        "skill_data.max_skill_effect AS max_skill_effect " +
+                        "FROM card_data " +
+                        "LEFT JOIN stat ON card_data.card_id = stat.card_id " +
+                        "LEFT JOIN skill_data ON card_data.skill_id = skill_data.skill_id");
+                db.execSQL("CREATE TEMP VIEW calculate AS SELECT " +
+                        "card_data.card_id AS card_id, " +
+                        "card_data.card_name AS card_name, " +
+                        "card_data.attribute AS attribute, " +
+                        "card_data.cost AS cost, " +
+                        "stat.max_final_attack AS attack, " +
+                        "stat.max_final_defense AS defense, " +
+                        "'content://" + ImageProvider.AUTHORITY + "/card/ls/' || card_data.card_id || '.png' AS image_uri, " +
+                        "'content://" + ImageProvider.AUTHORITY + "/card/xs/' || card_data.card_id || '.png' AS icon_uri, " +
+                        "skill_data.skill_name AS skill_name, " +
+                        "REPLACE(skill_data.skill_effect, '\\n', ' ') AS skill_effect, " +
+                        "(skill_data.skill_conditions IN (1, 3)) AS attack_skill, " +
+                        "(skill_data.skill_conditions IN (2, 3)) AS defense_skill, " +
+                        "skill_data.skill_target AS skill_target, " +
+                        "skill_data.level1_skill_effect AS skill_effect_1, " +
+                        "skill_data.level2_skill_effect AS skill_effect_2, " +
+                        "skill_data.level3_skill_effect AS skill_effect_3, " +
+                        "skill_data.level4_skill_effect AS skill_effect_4, " +
+                        "skill_data.level5_skill_effect AS skill_effect_5, " +
+                        "skill_data.level6_skill_effect AS skill_effect_6, " +
+                        "skill_data.level7_skill_effect AS skill_effect_7, " +
+                        "skill_data.level8_skill_effect AS skill_effect_8, " +
+                        "skill_data.level9_skill_effect AS skill_effect_9, " +
+                        "skill_data.level10_skill_effect AS skill_effect_10 " +
                         "FROM card_data " +
                         "LEFT JOIN stat ON card_data.card_id = stat.card_id " +
                         "LEFT JOIN skill_data ON card_data.skill_id = skill_data.skill_id");
@@ -164,7 +196,10 @@ public class CardProvider extends ContentProvider {
                         "UNION SELECT card_id, 14 AS kind_id, 'birthday1' AS comments_kind, comment1 AS comment_value, 1 AS secret FROM idol_birthday " +
                         "UNION SELECT card_id, 15 AS kind_id, 'birthday2' AS comments_kind, comment2 AS comment_value, 1 AS secret FROM idol_birthday " +
                         "UNION SELECT card_id, 16 AS kind_id, 'birthday3' AS comments_kind, comment3 AS comment_value, 1 AS secret FROM idol_birthday " +
-                        "UNION SELECT card_id, 17 AS kind_id, 'valentine' AS comments_kind, v_comments AS comment_value, 1 AS secret FROM v_comment");
+                        "UNION SELECT card_id, 17 AS kind_id, 'valentine' AS comments_kind, v_comments AS comment_value, 1 AS secret FROM v_comment " +
+                        "UNION SELECT card_id, 18 AS kind_id, 'gacha1' AS comments_kind, message_1 AS comment_value, 1 AS secret FROM gacha_sr_win_comments " +
+                        "UNION SELECT card_id, 19 AS kind_id, 'gacha2' AS comments_kind, message_2 AS comment_value, 1 AS secret FROM gacha_sr_win_comments " +
+                        "UNION SELECT card_id, 20 AS kind_id, 'gacha3' AS comments_kind, message_3 AS comment_value, 1 AS secret FROM gacha_sr_win_comments WHERE message_1 <> message_3 ");
                 db.execSQL("CREATE TEMP VIEW current_stat AS SELECT " +
                         "card_id, " +
                         "max_level=1 AS no_levelup, " +
@@ -328,6 +363,11 @@ public class CardProvider extends ContentProvider {
             // FALL_THROUGH
             case CODE_DETAIL: {
                 return helper.getReadableDatabase().query("card_profile", projection, selection, selectionArgs, null, null, sortOrder);
+            }
+            case CODE_CALCULATE_ID: {
+                selection = "(" + selection + ") AND card_id = ?";
+                selectionArgs = DatabaseUtils.appendSelectionArgs(selectionArgs, new String[]{uri.getLastPathSegment()});
+                return helper.getReadableDatabase().query("calculate", projection, selection, selectionArgs, null, null, sortOrder);
             }
             default:
                 throw new IllegalArgumentException("Unknown URI : " + uri);
